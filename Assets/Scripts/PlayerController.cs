@@ -6,9 +6,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public float test = 3;
     bool canMove = true;
 
-    private void Awake()
+    private void Start()
     {
         GameEvents.instance.playerTurnStart += PlayerTurnStart;
         GameEvents.instance.enemyTurnStart += EnemyTurnStart;
@@ -17,20 +18,19 @@ public class PlayerController : MonoBehaviour
 
     private void BoardStep(Vector3 destination)
     {
+        canMove = false;
         StartCoroutine(MovePlayer(destination));
         print("BoardStep ran from PlayerController.cs");
     }
 
     IEnumerator MovePlayer(Vector3 destination)
     {
-        float totalMovementTime = 5f; //The amount of time for the movement to take
-        float currentMovementTime = 0f;//The amount of time that has passed
         while (transform.position != destination)
         {
-            currentMovementTime += Time.deltaTime;
-            transform.localPosition = Vector3.Lerp(transform.position, destination, currentMovementTime / totalMovementTime);
+            transform.localPosition = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
             yield return null;
         }
+        canMove = true;
         yield return null;
     }
 
@@ -48,17 +48,17 @@ public class PlayerController : MonoBehaviour
         if (canMove)
         {
             float inputX = Input.GetAxisRaw("Horizontal");
-            float inputY = Input.GetAxisRaw("Vertical");
+            float inputZ = Input.GetAxisRaw("Vertical");
 
             if (Input.GetAxisRaw("Horizontal") != 0)
             {
-                canMove = false;
-                GameEvents.instance.BoardStep(new Vector3(inputX, 0, 0));
+                Vector3 destination = new Vector3(transform.position.x + Mathf.Sign(inputX), transform.position.y, transform.position.z);
+                GameEvents.instance.BoardStep(destination);
             }
             else if (Input.GetAxisRaw("Vertical") != 0)
             {
-                canMove = false;
-                GameEvents.instance.BoardStep(new Vector3(0, 0, inputY));
+                Vector3 destination = new Vector3(transform.position.x, transform.position.y, transform.position.z + Mathf.Sign(inputZ));
+                GameEvents.instance.BoardStep(destination);
             }
         }
     }
