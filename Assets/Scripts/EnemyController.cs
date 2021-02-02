@@ -13,12 +13,15 @@ public enum EnemyState
 public class EnemyController : MonoBehaviour
 {
     public EnemyState currentState = EnemyState.Patrol;
+    Pathfinding pathfinding;
+
     // Start is called before the first frame update
     private void Start()
     {
         GameEvents.instance.playerTurnStart += PlayerTurnStart;
         GameEvents.instance.enemyTurnStart += EnemyTurnStart;
         GameEvents.instance.boardStep += BoardStep;
+        pathfinding = GameManager.instance.GetComponent<Pathfinding>();
     }
     /* NOTES for dev:
  * 
@@ -38,6 +41,7 @@ public class EnemyController : MonoBehaviour
                 RandomPatrolStep();
                 break;
             case EnemyState.Targeting:
+                GoTowardsPlayer();
                 break;
             case EnemyState.InAttackRange:
                 break;
@@ -45,6 +49,13 @@ public class EnemyController : MonoBehaviour
                 break;
         }
     }
+
+    private void GoTowardsPlayer()
+    {
+        List<Node> path = pathfinding.GetPath(transform.position, PlayerController.instance.transform.position);
+        StartCoroutine(MoveUnit(path[0].worldPosition));
+    }
+
     private void EnemyTurnStart()
     {
     }
@@ -74,6 +85,8 @@ public class EnemyController : MonoBehaviour
         {
             direction.z = transform.position.z + 1;
         }
+
+
         StartCoroutine(MoveUnit(direction));
     }
     IEnumerator MoveUnit(Vector3 destination)

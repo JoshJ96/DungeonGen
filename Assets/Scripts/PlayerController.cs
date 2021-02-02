@@ -6,6 +6,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    #region Singleton
+    public static PlayerController instance;
+    private void Awake()
+    {
+        instance = this;
+    }
+    #endregion
+
     public float test = 3;
     bool canMove = true;
 
