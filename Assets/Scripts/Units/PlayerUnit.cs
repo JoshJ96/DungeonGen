@@ -6,7 +6,6 @@ using UnityEngine;
 public class PlayerUnit : Unit
 {
     public List<Vector3> CurrentAttackRange = new List<Vector3> { Vector3.zero };
-    public bool moving = false;
 
     private void Start()
     {

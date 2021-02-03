@@ -4,4 +4,6 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    public bool moving = false;
+    public Node desiredNode;
 }

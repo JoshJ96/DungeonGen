@@ -27,7 +27,7 @@ public class Grid : MonoBehaviour
 
     private void LateUpdate()
     {
-		//CreateGrid();
+		CreateGrid();
 	}
 
 	void CreateGrid()

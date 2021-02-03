@@ -13,13 +13,33 @@ public enum State
 
 public class EnemyUnit : Unit
 {
-    public bool moving = false;
     public State currentState;
     public List<Vector3> CurrentAttackRange = new List<Vector3> { Vector3.zero };
 
     private void Start()
     {
         GameEvents.instance.movePatrolUnits += MovePatrolUnits;
+        GameEvents.instance.moveUnit += MoveUnit;
+
+    }
+
+    private void MoveUnit(Unit unit, Vector3 destination)
+    {
+        if (unit.gameObject == this.gameObject)
+        {
+            StartCoroutine(Move(destination));
+        }
+    }
+
+    IEnumerator Move(Vector3 destination)
+    {
+        moving = true;
+        while (transform.position != destination)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
+            yield return null;
+        }
+        moving = false;
     }
 
     private void MovePatrolUnits()
@@ -51,7 +71,7 @@ public class EnemyUnit : Unit
             yield return null;
         }
         moving = false;
-        GameObject.FindObjectOfType<BoardManager>().currentState = States.WaitingForPlayerInput;
+        //GameObject.FindObjectOfType<BoardManager>().currentState = States.WaitingForPlayerInput;
     }
 
     private void OnDrawGizmos()
