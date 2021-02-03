@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ public enum States
 public class BoardManager : MonoBehaviour
 {
     Grid worldGrid;
-    States currentState = States.WaitingForPlayerInput;
+    public States currentState = States.WaitingForPlayerInput;
     PlayerUnit PlayerUnit;
 
     private void Start()
@@ -31,28 +32,43 @@ public class BoardManager : MonoBehaviour
                 float inputZ = Input.GetAxisRaw("Vertical");
                 if (inputX != 0)
                 {
-                    Vector3 desiredLocation = new Vector3(PlayerUnit.transform.localPosition.x + Mathf.Sign(inputX), 0, (PlayerUnit.transform.localPosition.z));
+                    //Desired player location
+                    Vector3 desiredLocation = new Vector3(
+                        PlayerUnit.transform.localPosition.x + Mathf.Sign(inputX),
+                        0,
+                        PlayerUnit.transform.localPosition.z);
+
+                    //Check the node at desiredLocation world point
                     Node toCheck = worldGrid.NodeFromWorldPoint(desiredLocation);
-                    print(toCheck.walkable);
+                   
                     if (toCheck.walkable)
                     {
-                        
+                        GameEvents.instance.MoveUnit(PlayerUnit, toCheck.worldPosition);
+                        currentState = States.MoveAndDeclump;
                     }
-                    
+
                 }
                 else if (inputZ != 0)
                 {
-                    Vector3 desiredLocation = new Vector3(PlayerUnit.transform.localPosition.x, 0, (PlayerUnit.transform.localPosition.z) + Mathf.Sign(inputZ));
+                    //Desired player location
+                    Vector3 desiredLocation = new Vector3(
+                        PlayerUnit.transform.localPosition.x,
+                        0,
+                        PlayerUnit.transform.localPosition.z + Mathf.Sign(inputZ));
+
+                    //Check the node at desiredLocation world point
                     Node toCheck = worldGrid.NodeFromWorldPoint(desiredLocation);
-                    print(toCheck.walkable);
+
                     if (toCheck.walkable)
                     {
-
+                        GameEvents.instance.MoveUnit(PlayerUnit, toCheck.worldPosition);
+                        currentState = States.MoveAndDeclump;
                     }
                 }
                 break;
 
             case States.MoveAndDeclump:
+
                 break;
 
             case States.EnemyAttackPhase:

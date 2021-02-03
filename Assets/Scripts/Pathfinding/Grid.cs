@@ -21,6 +21,11 @@ public class Grid : MonoBehaviour
 		CreateGrid();
 	}
 
+    private void LateUpdate()
+    {
+		//CreateGrid();
+	}
+
 	void CreateGrid()
 	{
 		grid = new Node[gridSizeX, gridSizeY];
@@ -75,6 +80,7 @@ public class Grid : MonoBehaviour
 	}
 
 	public List<Node> path;
+
 	void OnDrawGizmos()
 	{
 		Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
@@ -88,7 +94,7 @@ public class Grid : MonoBehaviour
 					if (path.Contains(n))
 					{
 						Gizmos.color = Color.green;
-						Gizmos.DrawWireCube(n.worldPosition, Vector3.one * (nodeDiameter));
+						Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter));
 					}
 				}
 			}
