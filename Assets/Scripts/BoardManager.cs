@@ -7,7 +7,8 @@ using UnityEngine;
 public enum States
 {
     WaitingForPlayerInput,
-    MoveAndDeclump,
+    CalculateMovements,
+    MovingUnits,
     EnemyAttackPhase,
     ExtraPhase
 }
@@ -33,8 +34,6 @@ public class BoardManager : MonoBehaviour
 
                 if (inputVector != Vector3.zero)
                 {
-                    currentState = States.MoveAndDeclump;
-
                     //Desired player location
                     Vector3 desiredLocation = new Vector3(
                         playerUnit.transform.localPosition.x + inputVector.x,
@@ -46,6 +45,7 @@ public class BoardManager : MonoBehaviour
 
                     if (toCheck.walkable)
                     {
+                        currentState = States.CalculateMovements;
                         playerUnit.desiredNode = toCheck;
 
                         List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.currentState == State.Patrol).ToList();
@@ -87,15 +87,22 @@ public class BoardManager : MonoBehaviour
                             GameEvents.instance.MoveUnit(unit, unit.desiredNode.worldPosition);
                         }
 
+                        currentState = States.MovingUnits;
+
                         //GameEvents.instance.MovePatrolUnits();
                         //currentState = States.MoveAndDeclump;
                     }
                 }
                 break;
 
-            case States.MoveAndDeclump:
-                //if (!anyUnitsMoving())
-                    //currentState = States.WaitingForPlayerInput;
+            case States.CalculateMovements:
+                break;
+
+            case States.MovingUnits:
+                if (!anyUnitsMoving())
+                {
+                    currentState = States.WaitingForPlayerInput;
+                }
                 break;
 
             case States.EnemyAttackPhase:

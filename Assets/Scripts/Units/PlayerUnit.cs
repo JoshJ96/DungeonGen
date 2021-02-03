@@ -31,7 +31,7 @@ public class PlayerUnit : Unit
         moving = false;
     }
 
-    private void OnDrawGizmos()
+    /*private void OnDrawGizmos()
     {
         //Draw attack range
         foreach (var tile in CurrentAttackRange)
@@ -39,5 +39,5 @@ public class PlayerUnit : Unit
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireCube(transform.position + tile, Vector3.one);
         }
-    }
+    }*/
 }

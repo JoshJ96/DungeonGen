@@ -74,7 +74,7 @@ public class EnemyUnit : Unit
         //GameObject.FindObjectOfType<BoardManager>().currentState = States.WaitingForPlayerInput;
     }
 
-    private void OnDrawGizmos()
+    /*private void OnDrawGizmos()
     {
         //Draw attack range
         foreach (var tile in CurrentAttackRange)
@@ -82,5 +82,5 @@ public class EnemyUnit : Unit
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position + tile, Vector3.one);
         }
-    }
+    }*/
 }
