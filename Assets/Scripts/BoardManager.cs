@@ -44,6 +44,7 @@ public class BoardManager : MonoBehaviour
                     if (toCheck.walkable)
                     {
                         GameEvents.instance.MoveUnit(PlayerUnit, toCheck.worldPosition);
+                        GameEvents.instance.MovePatrolUnits();
                         currentState = States.MoveAndDeclump;
                     }
 
@@ -62,6 +63,7 @@ public class BoardManager : MonoBehaviour
                     if (toCheck.walkable)
                     {
                         GameEvents.instance.MoveUnit(PlayerUnit, toCheck.worldPosition);
+                        GameEvents.instance.MovePatrolUnits();
                         currentState = States.MoveAndDeclump;
                     }
                 }

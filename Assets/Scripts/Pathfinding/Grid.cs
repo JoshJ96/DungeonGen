@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
-
 	public LayerMask unwalkableMask;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
@@ -13,8 +12,13 @@ public class Grid : MonoBehaviour
 	float nodeDiameter;
 	int gridSizeX, gridSizeY;
 
+	#region Singleton
+	public static Grid instance;
+	#endregion
+
 	void Awake()
 	{
+		instance = this;
 		nodeDiameter = nodeRadius * 2;
 		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
@@ -50,7 +54,7 @@ public class Grid : MonoBehaviour
 		{
 			for (int y = -1; y <= 1; y++)
 			{
-				if (x == 0 && y == 0 || (x == -1 && y == -1) || (x == -1 && y == 1) || (x == 1 && y == 1) || (x == 1 && y == -1))
+				if (x == 0 && y == 0)
 					continue;
 
 				int checkX = node.gridX + x;
