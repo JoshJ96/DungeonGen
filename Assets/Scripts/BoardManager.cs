@@ -7,6 +7,7 @@ using UnityEngine;
 public class BoardManager : MonoBehaviour
 {
     Grid worldGrid;
+    Pathfinding pathfinding;
 
     #region State Machine Setup
 
@@ -26,6 +27,7 @@ public class BoardManager : MonoBehaviour
     private void Start()
     {
         worldGrid = GetComponent<Grid>();
+        pathfinding = GetComponent<Pathfinding>();
     }
 
     void Update()
@@ -53,6 +55,9 @@ public class BoardManager : MonoBehaviour
 
                         //All enemy units will scan for player and change their states accordingly
                         GameEvents.instance.ScanForPlayerInAggroRange();
+
+                        //Calculate the desired nodes for aggro units
+                        SetAggroUnitDesiredNodes();
 
                         //Calculate the desired nodes for patrol units
                         SetPatrolUnitDesiredNodes();
@@ -88,6 +93,30 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    private void SetAggroUnitDesiredNodes()
+    {
+        //Grab list of enemy units in the "aggro" state
+        List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
+
+        //Loop through each patrol unit and find the first element of it's A* path
+        foreach (EnemyUnit unit in enemyPatrolUnits)
+        {
+            pathfinding.FindPath(unit.transform.position, PlayerUnit.instance.transform.position);
+
+            //Save desired node if it's not a dupe
+            if (worldGrid.path != null)
+            {
+                if (worldGrid.path.Count != 0)
+                {
+                    if (!IsDuplicateDesiredNode(worldGrid.path[0]))
+                    {
+                        unit.SetDesiredNode(worldGrid.path[0]);
+                    }
+                }
+            }
+        }
+    }
+
     //Calculate the desired nodes for patrol units
     private void SetPatrolUnitDesiredNodes()
     {
@@ -106,7 +135,7 @@ public class BoardManager : MonoBehaviour
                 int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
                 Node randomNode = surroundingNodes[randomIndex];
 
-                //Save desired node
+                //Save desired node if it's not a dupe
                 if (!IsDuplicateDesiredNode(randomNode))
                 {
                     unit.SetDesiredNode(randomNode);
