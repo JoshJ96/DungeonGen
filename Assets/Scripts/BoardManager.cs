@@ -85,6 +85,22 @@ public class BoardManager : MonoBehaviour
                     currentState = States.WaitingForPlayerInput;
                 break;
             case States.EnemyAttackPhase:
+
+                //All units scan for player in attack range
+                //Get this list ^
+
+                //*Sort by speeds and stuff could go here*
+
+                //While list is not empty
+
+                //Execute 1 coroutine
+
+                //switch state maybe?
+
+                //When list is empty and all coroutines are done
+
+                //Extraphase then player turn
+
                 break;
             case States.ExtraPhase:
                 break;
