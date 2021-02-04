@@ -487,7 +487,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &409112246
@@ -597,7 +597,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &512160589
@@ -829,7 +829,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &873175148
@@ -983,7 +983,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &912392369
@@ -1239,7 +1239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &1147533057
@@ -1349,7 +1349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 1
   moving: 0
   currentState: 0
 --- !u!65 &1225085403
@@ -1459,7 +1459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &1262253456
@@ -1677,7 +1677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &1499793610
@@ -1773,7 +1773,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0
-  aggroRange: 0
+  aggroRange: 3
   moving: 0
   currentState: 0
 --- !u!65 &1848814911

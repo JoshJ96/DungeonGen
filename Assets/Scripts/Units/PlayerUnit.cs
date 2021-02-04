@@ -36,6 +36,4 @@ public class PlayerUnit : Unit
         }
         moving = false;
     }
-
-    public List<Vector3> CurrentAttackRange = new List<Vector3> { Vector3.zero };
 }
