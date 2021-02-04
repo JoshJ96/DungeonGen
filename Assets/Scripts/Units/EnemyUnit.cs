@@ -14,13 +14,12 @@ public enum State
 public class EnemyUnit : Unit
 {
     public State currentState;
-    public List<Vector3> CurrentAttackRange = new List<Vector3> { Vector3.zero };
+    public int attackRange;
+    public int aggroRange;
 
     private void Start()
     {
-        GameEvents.instance.movePatrolUnits += MovePatrolUnits;
         GameEvents.instance.moveUnit += MoveUnit;
-
     }
 
     private void MoveUnit(Unit unit, Vector3 destination)
@@ -31,49 +30,6 @@ public class EnemyUnit : Unit
         }
     }
 
-    IEnumerator Move(Vector3 destination)
-    {
-        moving = true;
-        while (transform.position != destination)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
-            yield return null;
-        }
-        moving = false;
-    }
-
-    private void MovePatrolUnits()
-    {
-        if (currentState == State.Patrol)
-        {
-            //Get surrounding nodes
-            List<Node> surroundingNodes = Grid.instance.GetNeighbours(Grid.instance.NodeFromWorldPoint(transform.position));
-
-            //Limit nodes to only walkable nodes
-            surroundingNodes = surroundingNodes.Where(x => x.walkable).ToList();
-
-            //Pick one at random
-            if (surroundingNodes.Count != 0)
-            {
-                int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
-                //Move to it
-                StartCoroutine(MoveUnit(surroundingNodes[randomIndex].worldPosition));
-            }
-        }
-    }
-
-    IEnumerator MoveUnit(Vector3 destination)
-    {
-        moving = true;
-        while (transform.position != destination)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
-            yield return null;
-        }
-        moving = false;
-        //GameObject.FindObjectOfType<BoardManager>().currentState = States.WaitingForPlayerInput;
-    }
-
     /*private void OnDrawGizmos()
     {
         //Draw attack range
@@ -81,6 +37,6 @@ public class EnemyUnit : Unit
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position + tile, Vector3.one);
-        }
+        } 
     }*/
 }

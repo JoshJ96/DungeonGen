@@ -4,20 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum States
-{
-    WaitingForPlayerInput,
-    CalculateMovements,
-    MovingUnits,
-    EnemyAttackPhase,
-    ExtraPhase
-}
-
 public class BoardManager : MonoBehaviour
 {
     Grid worldGrid;
-    public States currentState = States.WaitingForPlayerInput;
     PlayerUnit playerUnit;
+
+    #region State Machine Setup
+
+    private States currentState;
+    public enum States
+    {
+        WaitingForPlayerInput,
+        CalculateMovements,
+        MovingUnits,
+        EnemyAttackPhase,
+        ExtraPhase
+    }
+    public void ChangeState(States state) => currentState = state;
+
+    #endregion
 
     private void Start()
     {
@@ -30,96 +35,102 @@ public class BoardManager : MonoBehaviour
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
-                Vector3 inputVector = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-
-                if (inputVector != Vector3.zero)
+                if (GetInputVector() != Vector3.zero)
                 {
                     //Desired player location
                     Vector3 desiredLocation = new Vector3(
-                        playerUnit.transform.localPosition.x + inputVector.x,
+                        playerUnit.transform.position.x + GetInputVector().x,
                         0,
-                        playerUnit.transform.localPosition.z + inputVector.z);
+                        playerUnit.transform.position.z + GetInputVector().z);
 
                     //Check the node at desiredLocation world point
                     Node toCheck = worldGrid.NodeFromWorldPoint(desiredLocation);
 
+                    //If the node is walkable
                     if (toCheck.walkable)
                     {
-                        currentState = States.CalculateMovements;
-                        playerUnit.desiredNode = toCheck;
+                        //Disable player input and set their desired node
+                        ChangeState(States.CalculateMovements);
+                        playerUnit.SetDesiredNode(toCheck);
 
+                        //Grab list of enemy units in the "patrol" state
                         List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.currentState == State.Patrol).ToList();
+
+                        //Loop through each patrol unit and find random desired tiles
                         foreach (EnemyUnit unit in enemyPatrolUnits)
                         {
-                            //Get surrounding nodes
-                            List<Node> surroundingNodes = Grid.instance.GetNeighbours(Grid.instance.NodeFromWorldPoint(unit.transform.position));
+                            //Get surrounding nodes (walkable only)
+                            List<Node> surroundingNodes = worldGrid.GetNeighbours(worldGrid.NodeFromWorldPoint(unit.transform.position)).Where(x => x.walkable).ToList();
 
-                            //Pick random nodes until an unclaimed one is found
+                            //Pick random nodes until an unclaimed one is found. If none is ever found, that's ok. The unit will be skipped
                             while (surroundingNodes.Count != 0)
                             {
-                                //Limit nodes to only walkable nodes
-                                surroundingNodes = surroundingNodes.Where(x => x.walkable).ToList();
+                                int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
+                                Node randomNode = surroundingNodes[randomIndex];
 
-                                //Pick one at random
-                                if (surroundingNodes.Count != 0)
+                                //Save desired node
+                                if (!IsDuplicateDesiredNode(randomNode))
                                 {
-                                    int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
-
-                                    //Save desired node
-                                    if (!isDuplicateDesiredNode(surroundingNodes[randomIndex]))
-                                    {
-                                        unit.desiredNode = surroundingNodes[randomIndex];
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        surroundingNodes.RemoveAt(randomIndex);
-                                    }
+                                    unit.SetDesiredNode(randomNode);
+                                    break;
+                                }
+                                //If it can't be walked to, remove it from the list and continue the while loop
+                                else
+                                {
+                                    surroundingNodes.RemoveAt(randomIndex);
                                 }
                             }
-
-                        }//End of (unit in enemyPatrolUnits) loop
-
-                        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.desiredNode != null).ToList();
-
-                        foreach (var unit in toMove)
-                        {
-                            GameEvents.instance.MoveUnit(unit, unit.desiredNode.worldPosition);
                         }
 
-                        currentState = States.MovingUnits;
+                        //Build list of units ready to be moved
+                        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
 
-                        //GameEvents.instance.MovePatrolUnits();
-                        //currentState = States.MoveAndDeclump;
+                        //Move all units
+                        foreach (var unit in toMove)
+                        {
+                            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
+                        }
+
+                        //Exit the state
+                        ChangeState(States.MovingUnits);
                     }
                 }
                 break;
-
             case States.CalculateMovements:
                 break;
-
             case States.MovingUnits:
-                if (!anyUnitsMoving())
-                {
+                //Once all units are done with their move, the next phase can begin
+                if (!AnyUnitsMoving())
                     currentState = States.WaitingForPlayerInput;
-                }
                 break;
-
             case States.EnemyAttackPhase:
                 break;
-
             case States.ExtraPhase:
                 break;
-
             default:
                 break;
         }
     }
 
-    //Helper functions
-    bool anyUnitsMoving()
+    /*******************************************************
+    ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
+    ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝
+    ███████║█████╗░░██║░░░░░██████╔╝█████╗░░██████╔╝╚█████╗░
+    ██╔══██║██╔══╝░░██║░░░░░██╔═══╝░██╔══╝░░██╔══██╗░╚═══██╗
+    ██║░░██║███████╗███████╗██║░░░░░███████╗██║░░██║██████╔╝
+    ╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═════╝░
+     *******************************************************/
+
+    //Builds vector3 based on horizontal and vertical inputs
+    private Vector3 GetInputVector()
     {
-        List<Unit> units = GameObject.FindObjectsOfType<Unit>().ToList();
+        return new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+    }
+
+    //Scans all units in the room and checks if they're moving
+    private bool AnyUnitsMoving()
+    {
+        List<Unit> units = FindObjectsOfType<Unit>().ToList();
         foreach (var unit in units)
         {
             if (unit.moving)
@@ -130,16 +141,18 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    bool isDuplicateDesiredNode(Node toCheck)
+    //Scans all units in the room and checks if any desired nodes collide
+    private bool IsDuplicateDesiredNode(Node toCheck)
     {
-        List<Unit> units = GameObject.FindObjectsOfType<Unit>().Where(x => x.desiredNode != null).ToList();
+        List<Unit> units = GameObject.FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
         foreach (var item in units)
         {
-            if (toCheck.worldPosition == item.desiredNode.worldPosition)
+            if (toCheck.worldPosition == item.GetDesiredNode().worldPosition)
             {
                 return true;
             }
         }
         return false;
     }
+
 }

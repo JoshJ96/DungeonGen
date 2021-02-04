@@ -16,8 +16,4 @@ public class GameEvents : MonoBehaviour
     //Move a singular unit
     public event Action<Unit, Vector3> moveUnit;
     public void MoveUnit(Unit unit, Vector3 point) => moveUnit?.Invoke(unit, point);
-
-    //Move all "patrol" units
-    public event Action movePatrolUnits;
-    public void MovePatrolUnits() => movePatrolUnits?.Invoke();
 }
