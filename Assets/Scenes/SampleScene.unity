@@ -227,6 +227,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afccebef8394bee4e9d0cb492ddd54c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   CurrentAttackRange:
   - {x: 1, y: 0, z: 0}
@@ -484,17 +486,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &409112246
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -601,17 +596,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &512160589
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -840,17 +828,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &873175148
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1001,17 +982,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &912392369
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1264,17 +1238,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &1147533057
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1381,17 +1348,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &1225085403
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1498,17 +1458,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &1262253456
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1723,17 +1676,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &1499793610
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1826,17 +1772,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8afef4ef6ec0ef4195d1061f62b0d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 0
+  aggroRange: 0
   moving: 0
   currentState: 0
-  CurrentAttackRange:
-  - {x: 1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: 1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: -1, y: 0, z: 1}
-  - {x: -1, y: 0, z: -1}
-  - {x: 0, y: 0, z: -1}
-  - {x: 1, y: 0, z: -1}
 --- !u!65 &1848814911
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1957,7 +1896,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd88f700b08c8e4c82c5a94991738d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
 --- !u!114 &1876988168
 MonoBehaviour:
   m_ObjectHideFlags: 0

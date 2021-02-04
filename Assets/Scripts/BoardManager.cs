@@ -7,7 +7,6 @@ using UnityEngine;
 public class BoardManager : MonoBehaviour
 {
     Grid worldGrid;
-    PlayerUnit playerUnit;
 
     #region State Machine Setup
 
@@ -27,7 +26,6 @@ public class BoardManager : MonoBehaviour
     private void Start()
     {
         worldGrid = GetComponent<Grid>();
-        playerUnit = FindObjectOfType<PlayerUnit>();
     }
 
     void Update()
@@ -39,9 +37,9 @@ public class BoardManager : MonoBehaviour
                 {
                     //Desired player location
                     Vector3 desiredLocation = new Vector3(
-                        playerUnit.transform.position.x + GetInputVector().x,
+                        PlayerUnit.instance.transform.position.x + GetInputVector().x,
                         0,
-                        playerUnit.transform.position.z + GetInputVector().z);
+                        PlayerUnit.instance.transform.position.z + GetInputVector().z);
 
                     //Check the node at desiredLocation world point
                     Node toCheck = worldGrid.NodeFromWorldPoint(desiredLocation);
@@ -51,36 +49,14 @@ public class BoardManager : MonoBehaviour
                     {
                         //Disable player input and set their desired node
                         ChangeState(States.CalculateMovements);
-                        playerUnit.SetDesiredNode(toCheck);
+                        PlayerUnit.instance.SetDesiredNode(toCheck);
 
-                        //Grab list of enemy units in the "patrol" state
-                        List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.currentState == State.Patrol).ToList();
+                        //All enemy units will scan for player and change their states accordingly
+                        GameEvents.instance.ScanForPlayerInAggroRange();
 
-                        //Loop through each patrol unit and find random desired tiles
-                        foreach (EnemyUnit unit in enemyPatrolUnits)
-                        {
-                            //Get surrounding nodes (walkable only)
-                            List<Node> surroundingNodes = worldGrid.GetNeighbours(worldGrid.NodeFromWorldPoint(unit.transform.position)).Where(x => x.walkable).ToList();
-
-                            //Pick random nodes until an unclaimed one is found. If none is ever found, that's ok. The unit will be skipped
-                            while (surroundingNodes.Count != 0)
-                            {
-                                int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
-                                Node randomNode = surroundingNodes[randomIndex];
-
-                                //Save desired node
-                                if (!IsDuplicateDesiredNode(randomNode))
-                                {
-                                    unit.SetDesiredNode(randomNode);
-                                    break;
-                                }
-                                //If it can't be walked to, remove it from the list and continue the while loop
-                                else
-                                {
-                                    surroundingNodes.RemoveAt(randomIndex);
-                                }
-                            }
-                        }
+                        //Calculate the desired nodes for patrol units
+                        SetPatrolUnitDesiredNodes();
+                        
 
                         //Build list of units ready to be moved
                         List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
@@ -109,6 +85,39 @@ public class BoardManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    //Calculate the desired nodes for patrol units
+    private void SetPatrolUnitDesiredNodes()
+    {
+        //Grab list of enemy units in the "patrol" state
+        List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.Patrol).ToList();
+
+        //Loop through each patrol unit and find random desired tiles
+        foreach (EnemyUnit unit in enemyPatrolUnits)
+        {
+            //Get surrounding nodes (walkable only)
+            List<Node> surroundingNodes = worldGrid.GetNeighbours(worldGrid.NodeFromWorldPoint(unit.transform.position)).Where(x => x.walkable).ToList();
+
+            //Pick random nodes until an unclaimed one is found. If none is ever found, that's ok. The unit will be skipped
+            while (surroundingNodes.Count != 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, surroundingNodes.Count);
+                Node randomNode = surroundingNodes[randomIndex];
+
+                //Save desired node
+                if (!IsDuplicateDesiredNode(randomNode))
+                {
+                    unit.SetDesiredNode(randomNode);
+                    break;
+                }
+                //If it can't be walked to, remove it from the list and continue the while loop
+                else
+                {
+                    surroundingNodes.RemoveAt(randomIndex);
+                }
+            }
         }
     }
 
@@ -148,6 +157,18 @@ public class BoardManager : MonoBehaviour
         foreach (var item in units)
         {
             if (toCheck.worldPosition == item.GetDesiredNode().worldPosition)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool PlayerInAggroRange(Unit unit)
+    {
+        foreach (var item in unit.GetRange(unit.aggroRange))
+        {
+            if (PlayerUnit.instance.transform.position == item)
             {
                 return true;
             }

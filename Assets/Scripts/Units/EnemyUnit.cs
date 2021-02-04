@@ -4,39 +4,63 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum State
-{
-    Patrol,
-    TargetingPlayer,
-    PlayerInAttackRange
-}
-
 public class EnemyUnit : Unit
 {
-    public State currentState;
-    public int attackRange;
-    public int aggroRange;
+
+    #region State Machine Setup
+    public enum EnemyStates
+    {
+        Patrol,
+        TargetingPlayer,
+        PlayerInAttackRange
+    }
+    public EnemyStates currentState = EnemyStates.Patrol;
+
+    public void SetState(EnemyStates state)
+    {
+        currentState = state;
+    }
+    public EnemyStates GetState()
+    {
+        return currentState;
+    }
+
+    #endregion
 
     private void Start()
     {
+        GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.moveUnit += MoveUnit;
     }
 
-    private void MoveUnit(Unit unit, Vector3 destination)
+    public void MoveUnit(Unit unit, Vector3 destination)
     {
-        if (unit.gameObject == this.gameObject)
+        if (unit.gameObject == gameObject)
         {
             StartCoroutine(Move(destination));
         }
     }
 
-    /*private void OnDrawGizmos()
+    public IEnumerator Move(Vector3 destination)
     {
-        //Draw attack range
-        foreach (var tile in CurrentAttackRange)
+        moving = true;
+        while (transform.position != destination)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(transform.position + tile, Vector3.one);
-        } 
-    }*/
+            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
+            yield return null;
+        }
+        moving = false;
+    }
+
+    //If a player is within aggro range, change the current state
+    private void ScanForPlayerInAggroRange()
+    {
+        foreach (Vector3 position in GetRange(aggroRange))
+        {
+            if (PlayerUnit.instance.transform.position == position)
+            {
+                SetState(EnemyStates.PlayerInAttackRange);
+            }
+        }
+    }
 }

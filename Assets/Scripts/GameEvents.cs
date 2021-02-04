@@ -16,4 +16,8 @@ public class GameEvents : MonoBehaviour
     //Move a singular unit
     public event Action<Unit, Vector3> moveUnit;
     public void MoveUnit(Unit unit, Vector3 point) => moveUnit?.Invoke(unit, point);
+
+    //Scan for player
+    public event Action scanForPlayerInAggroRange;
+    public void ScanForPlayerInAggroRange() => scanForPlayerInAggroRange?.Invoke();
 }
