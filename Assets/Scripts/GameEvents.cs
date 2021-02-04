@@ -17,7 +17,11 @@ public class GameEvents : MonoBehaviour
     public event Action<Unit, Vector3> moveUnit;
     public void MoveUnit(Unit unit, Vector3 point) => moveUnit?.Invoke(unit, point);
 
-    //Scan for player
+    //Scan for player in aggro range
     public event Action scanForPlayerInAggroRange;
     public void ScanForPlayerInAggroRange() => scanForPlayerInAggroRange?.Invoke();
+
+    //Scan for player in attack range
+    public event Action scanForPlayerInAttackRange;
+    public void ScanForPlayerInAttackRange() => scanForPlayerInAttackRange?.Invoke();
 }
