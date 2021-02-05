@@ -30,8 +30,11 @@ public class EnemyUnit : Unit
     private void Start()
     {
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
+        GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
         GameEvents.instance.moveUnit += MoveUnit;
     }
+
+
 
     public void MoveUnit(Unit unit, Vector3 destination)
     {
@@ -56,6 +59,17 @@ public class EnemyUnit : Unit
     private void ScanForPlayerInAggroRange()
     {
         foreach (Vector3 position in GetRange(aggroRange))
+        {
+            if (PlayerUnit.instance.transform.position == position)
+            {
+                SetState(EnemyStates.TargetingPlayer);
+            }
+        }
+    }
+
+    private void ScanForPlayerInAttackRange()
+    {
+        foreach (Vector3 position in GetRange(attackRange))
         {
             if (PlayerUnit.instance.transform.position == position)
             {

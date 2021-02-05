@@ -82,9 +82,26 @@ public class BoardManager : MonoBehaviour
             case States.MovingUnits:
                 //Once all units are done with their move, the next phase can begin
                 if (!AnyUnitsMoving())
-                    currentState = States.WaitingForPlayerInput;
+                    currentState = States.EnemyAttackPhase;
                 break;
             case States.EnemyAttackPhase:
+
+                //All enemy units will scan for player and change their states accordingly
+                GameEvents.instance.ScanForPlayerInAttackRange();
+
+                //Grab list of enemy units in the "attackRange" state
+                List<EnemyUnit> enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
+
+                if (enemyAttackingUnits.Count == 0)
+                {
+                    currentState = States.WaitingForPlayerInput;
+                }
+                else
+                {
+                    currentState = States.ExtraPhase;
+                }
+
+
 
                 //All units scan for player in attack range
                 //Get this list ^
@@ -112,7 +129,7 @@ public class BoardManager : MonoBehaviour
     private void SetAggroUnitDesiredNodes()
     {
         //Grab list of enemy units in the "aggro" state
-        List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
+        List<EnemyUnit> enemyPatrolUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.TargetingPlayer).ToList();
 
         //Loop through each patrol unit and find the first element of it's A* path
         foreach (EnemyUnit unit in enemyPatrolUnits)

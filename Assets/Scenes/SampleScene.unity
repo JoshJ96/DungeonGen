@@ -379,14 +379,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7418392039092998702, guid: 7a18757296c93e34cb104a9f03156787,
         type: 3}
+      propertyPath: weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7418392039092998702, guid: 7a18757296c93e34cb104a9f03156787,
+        type: 3}
       propertyPath: sharedProfile
       value: 
       objectReference: {fileID: 11400000, guid: 60eba623012f49743b50a0fa94b74248,
         type: 2}
-    - target: {fileID: 7418392039092998702, guid: 7a18757296c93e34cb104a9f03156787,
+    - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
         type: 3}
-      propertyPath: weight
-      value: 1
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
         type: 3}
@@ -405,6 +410,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -417,16 +427,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7418392039092998703, guid: 7a18757296c93e34cb104a9f03156787,
         type: 3}
@@ -750,13 +750,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: -0.36492595, y: -0.6341823, z: 0.46042228, w: -0.5026463}
+  m_LocalRotation: {x: 0.22124305, y: 0.77869844, z: -0.40969297, w: 0.420514}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 71.96, y: -256.8, z: 0}
+  m_LocalEulerAnglesHint: {x: 55.5, y: 123.26, z: 0}
 --- !u!1 &842615777
 GameObject:
   m_ObjectHideFlags: 0
