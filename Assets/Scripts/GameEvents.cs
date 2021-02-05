@@ -24,4 +24,8 @@ public class GameEvents : MonoBehaviour
     //Scan for player in attack range
     public event Action scanForPlayerInAttackRange;
     public void ScanForPlayerInAttackRange() => scanForPlayerInAttackRange?.Invoke();
+
+    //Do damage
+    public event Action<Unit, Unit, int> doDamage;
+    public void DoDamage(Unit givesDamage, Unit takesDamage, int amount) => doDamage?.Invoke(givesDamage, takesDamage, amount);
 }

@@ -8,6 +8,7 @@ public class BoardManager : MonoBehaviour
 {
     Grid worldGrid;
     Pathfinding pathfinding;
+    List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
 
     #region State Machine Setup
 
@@ -18,7 +19,8 @@ public class BoardManager : MonoBehaviour
         CalculateMovements,
         MovingUnits,
         EnemyAttackPhase,
-        ExtraPhase
+        ExtraPhase1,
+        ExtraPhase2
     }
     public void ChangeState(States state) => currentState = state;
 
@@ -82,44 +84,45 @@ public class BoardManager : MonoBehaviour
             case States.MovingUnits:
                 //Once all units are done with their move, the next phase can begin
                 if (!AnyUnitsMoving())
-                    currentState = States.EnemyAttackPhase;
+                {
+                    //Get ready and move to the attack phase
+                    GameEvents.instance.ScanForPlayerInAttackRange();
+
+                    //Grab list of enemy units in the "attackRange" state
+                    enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
+                    //todo: Sort by speeds and stuff could go here
+
+                    //If there's no enemies to attack the player, this phase is done
+                    if (enemyAttackingUnits.Count == 0)
+                    {
+                        currentState = States.WaitingForPlayerInput;
+                    }
+                    //If there is, it's time to order the turns of them
+                    else
+                    {
+                        enemyAttackingUnits[0].Attack(PlayerUnit.instance);
+                        currentState = States.EnemyAttackPhase;
+                    }
+                }
                 break;
             case States.EnemyAttackPhase:
-
-                //All enemy units will scan for player and change their states accordingly
-                GameEvents.instance.ScanForPlayerInAttackRange();
-
-                //Grab list of enemy units in the "attackRange" state
-                List<EnemyUnit> enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
-
-                if (enemyAttackingUnits.Count == 0)
+                if (!enemyAttackingUnits[0].isAttacking)
                 {
-                    currentState = States.WaitingForPlayerInput;
+                    enemyAttackingUnits.RemoveAt(0);
+                    if (enemyAttackingUnits.Count != 0)
+                    {
+                        enemyAttackingUnits[0].Attack(PlayerUnit.instance);
+                    }
+                    //If there's no enemies to attack the player, this phase is done
+                    else
+                    {
+                        print("Done");
+                        currentState = States.WaitingForPlayerInput;
+                    }
                 }
-                else
-                {
-                    currentState = States.ExtraPhase;
-                }
-
-
-
-                //All units scan for player in attack range
-                //Get this list ^
-
-                //*Sort by speeds and stuff could go here*
-
-                //While list is not empty
-
-                //Execute 1 coroutine
-
-                //switch state maybe?
-
-                //When list is empty and all coroutines are done
-
-                //Extraphase then player turn
-
                 break;
-            case States.ExtraPhase:
+            case States.ExtraPhase2:
+
                 break;
             default:
                 break;
