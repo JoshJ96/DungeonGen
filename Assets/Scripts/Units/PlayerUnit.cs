@@ -26,8 +26,16 @@ public class PlayerUnit : Unit
         }
     }
 
+    float turnSmoothVelocity;
     public IEnumerator Move(Vector3 destination)
     {
+        Vector3 inputvector = new Vector3(destination.x - transform.position.x, 0, destination.z - transform.position.z);
+        //Calculate movement angle
+        float targetAngle = Mathf.Atan2(inputvector.x, inputvector.z) * Mathf.Rad2Deg;
+        //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.1f);
+        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+
+
         moving = true;
         while (transform.position != destination)
         {

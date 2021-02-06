@@ -28,4 +28,8 @@ public class GameEvents : MonoBehaviour
     //Do damage
     public event Action<Unit, Unit, int> doDamage;
     public void DoDamage(Unit givesDamage, Unit takesDamage, int amount) => doDamage?.Invoke(givesDamage, takesDamage, amount);
+
+    //Turn pass
+    public event Action turnPass;
+    public void TurnPass() => turnPass?.Invoke();
 }

@@ -9,6 +9,7 @@ public class BoardManager : MonoBehaviour
     Grid worldGrid;
     Pathfinding pathfinding;
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
+    bool canInput = true;
 
     #region State Machine Setup
 
@@ -30,10 +31,27 @@ public class BoardManager : MonoBehaviour
     {
         worldGrid = GetComponent<Grid>();
         pathfinding = GetComponent<Pathfinding>();
+        GameEvents.instance.turnPass += TurnPass;
+    }
+
+    private void TurnPass()
+    {
+        canInput = true;
     }
 
     void Update()
     {
+        //Press B to "rest" a turn
+        if (canInput)
+        {
+            if (Input.GetKey(KeyCode.JoystickButton1))
+            {
+                canInput = false;
+                InitializeTurn();
+            }
+        }
+
+        
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
@@ -54,28 +72,7 @@ public class BoardManager : MonoBehaviour
                         //Disable player input and set their desired node
                         ChangeState(States.CalculateMovements);
                         PlayerUnit.instance.SetDesiredNode(toCheck);
-
-                        //All enemy units will scan for player and change their states accordingly
-                        GameEvents.instance.ScanForPlayerInAggroRange();
-
-                        //Calculate the desired nodes for aggro units
-                        SetAggroUnitDesiredNodes();
-
-                        //Calculate the desired nodes for patrol units
-                        SetPatrolUnitDesiredNodes();
-                        
-
-                        //Build list of units ready to be moved
-                        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
-
-                        //Move all units
-                        foreach (var unit in toMove)
-                        {
-                            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
-                        }
-
-                        //Exit the state
-                        ChangeState(States.MovingUnits);
+                        InitializeTurn();
                     }
                 }
                 break;
@@ -95,6 +92,8 @@ public class BoardManager : MonoBehaviour
                     //If there's no enemies to attack the player, this phase is done
                     if (enemyAttackingUnits.Count == 0)
                     {
+                        //All units are done moving
+                        GameEvents.instance.TurnPass();
                         currentState = States.WaitingForPlayerInput;
                     }
                     //If there is, it's time to order the turns of them
@@ -116,7 +115,8 @@ public class BoardManager : MonoBehaviour
                     //If there's no enemies to attack the player, this phase is done
                     else
                     {
-                        print("Done");
+                        //All units are done moving
+                        GameEvents.instance.TurnPass();
                         currentState = States.WaitingForPlayerInput;
                     }
                 }
@@ -151,6 +151,31 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void InitializeTurn()
+    {
+        //All enemy units will scan for player and change their states accordingly
+        GameEvents.instance.ScanForPlayerInAggroRange();
+
+        //Calculate the desired nodes for aggro units
+        SetAggroUnitDesiredNodes();
+
+        //Calculate the desired nodes for patrol units
+        SetPatrolUnitDesiredNodes();
+
+
+        //Build list of units ready to be moved
+        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
+
+        //Move all units
+        foreach (var unit in toMove)
+        {
+            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
+        }
+
+        //Exit the state
+        ChangeState(States.MovingUnits);
     }
 
     //Calculate the desired nodes for patrol units

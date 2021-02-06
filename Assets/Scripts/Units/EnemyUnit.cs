@@ -39,8 +39,6 @@ public class EnemyUnit : Unit
         animator = GetComponent<Animator>();
     }
 
-    public GameObject attackIndicator;
-
     public void MoveUnit(Unit unit, Vector3 destination)
     {
         if (unit.gameObject == gameObject)
@@ -51,6 +49,8 @@ public class EnemyUnit : Unit
 
     public IEnumerator Move(Vector3 destination)
     {
+        RotateTowards(destination);
+
         moving = true;
         while (transform.position != destination)
         {
@@ -58,6 +58,16 @@ public class EnemyUnit : Unit
             yield return null;
         }
         moving = false;
+    }
+
+    private void RotateTowards(Vector3 destination)
+    {
+        //Get directional vector towards destination
+        Vector3 targetVector = new Vector3(destination.x - transform.position.x, 0, destination.z - transform.position.z);
+        //Calculate movement angle
+        float targetAngle = Mathf.Atan2(targetVector.x, targetVector.z) * Mathf.Rad2Deg;
+        //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.1f);
+        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
     }
 
     //If a player is within aggro range, change the current state
@@ -89,6 +99,7 @@ public class EnemyUnit : Unit
 
     public void Attack(Unit toAttack)
     {
+        RotateTowards(toAttack.transform.position);
         int randomDamage = UnityEngine.Random.Range(0, 10);
         GameEvents.instance.DoDamage(this, toAttack, randomDamage);
         StartCoroutine(PerformAttack());
@@ -97,11 +108,9 @@ public class EnemyUnit : Unit
     IEnumerator PerformAttack()
     {
         animator.SetBool("Attacking", true);
-        attackIndicator.SetActive(true);
         isAttacking = true;
         yield return new WaitForSeconds(1.00f);
         isAttacking = false;
-        attackIndicator.SetActive(false);
         animator.SetBool("Attacking", false);
     }
 }

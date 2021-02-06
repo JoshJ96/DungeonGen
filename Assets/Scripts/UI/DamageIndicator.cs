@@ -16,6 +16,11 @@ public class DamageIndicator : MonoBehaviour
         text = GetComponent<TextMeshPro>();
     }
 
+    private void Update()
+    {
+        transform.rotation = Quaternion.Euler(Vector3.zero);
+    }
+
     private void DoDamage(Unit attacking, Unit takingDamage, int damage)
     {
         text.text = $"{damage}";
