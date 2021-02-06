@@ -68,8 +68,10 @@ public class EnemyUnit : Unit
             if (PlayerUnit.instance.transform.position == position)
             {
                 SetState(EnemyStates.TargetingPlayer);
+                return;
             }
         }
+        SetState(EnemyStates.Patrol);
     }
 
     private void ScanForPlayerInAttackRange()
@@ -79,8 +81,10 @@ public class EnemyUnit : Unit
             if (PlayerUnit.instance.transform.position == position)
             {
                 SetState(EnemyStates.PlayerInAttackRange);
+                return;
             }
         }
+        ScanForPlayerInAggroRange();
     }
 
     public void Attack(Unit toAttack)
