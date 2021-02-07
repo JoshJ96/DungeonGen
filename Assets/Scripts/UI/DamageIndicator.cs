@@ -9,6 +9,7 @@ public class DamageIndicator : MonoBehaviour
 {
     Animator animator;
     public TextMeshPro text;
+
     void Start()
     {
         GameEvents.instance.doDamage += DoDamage;

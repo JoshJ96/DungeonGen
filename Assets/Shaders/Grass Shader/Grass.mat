@@ -64,7 +64,7 @@ Material:
     - _BladeCurve: 2.03
     - _BladeForward: -0.02
     - _BladeHeight: 0
-    - _BladeHeightRandom: 0.07
+    - _BladeHeightRandom: 0.1
     - _BladeRandomAmount: 0.5
     - _BladeSegments: 3
     - _BladeWidth: 0
@@ -85,14 +85,14 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TessellationUniform: 7.3
+    - _TessellationUniform: 8.3
     - _TranslucentGain: 0.6
     - _UVSec: 0
     - _WindScale: 1
     - _WindStrength: 1.29
     - _ZWrite: 1
     m_Colors:
-    - _BottomColor: {r: 0.15686275, g: 0.2509804, b: 0.23529413, a: 1}
+    - _BottomColor: {r: 0.27058825, g: 0.227451, b: 0.20000002, a: 1}
     - _Color: {r: 0, g: 0.5754717, b: 0.06694827, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _TopColor: {r: 0.8670556, g: 1, b: 0.759434, a: 1}

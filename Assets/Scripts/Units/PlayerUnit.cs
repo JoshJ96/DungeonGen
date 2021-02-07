@@ -13,35 +13,20 @@ public class PlayerUnit : Unit
     }
     #endregion
 
+    public Animator animator;
+
     private void Start()
     {
         GameEvents.instance.moveUnit += MoveUnit;
     }
 
-    public void MoveUnit(Unit unit, Vector3 destination)
+    private void Update()
     {
-        if (unit.gameObject == gameObject)
-        {
-            StartCoroutine(Move(destination));
-        }
+        animator.SetFloat("Blend", GetInputVector().normalized.magnitude);
     }
-
-    float turnSmoothVelocity;
-    public IEnumerator Move(Vector3 destination)
+    
+    private Vector3 GetInputVector()
     {
-        Vector3 inputvector = new Vector3(destination.x - transform.position.x, 0, destination.z - transform.position.z);
-        //Calculate movement angle
-        float targetAngle = Mathf.Atan2(inputvector.x, inputvector.z) * Mathf.Rad2Deg;
-        //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.1f);
-        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-
-
-        moving = true;
-        while (transform.position != destination)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
-            yield return null;
-        }
-        moving = false;
+        return new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
     }
 }

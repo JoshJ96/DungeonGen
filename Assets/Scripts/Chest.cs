@@ -15,8 +15,11 @@ public class Chest : MonoBehaviour
             Vector3 check = transform.position + tile;
             if (PlayerUnit.instance.transform.position == check)
             {
-                animator.SetTrigger("Popup");
-                return;
+                if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
+                {
+                    animator.SetTrigger("Popup");
+                    return;
+                }
             }
         }
         animator.SetTrigger("Deactivate");

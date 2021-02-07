@@ -16,10 +16,7 @@ public class EnemyUnit : Unit
     }
     public EnemyStates currentState = EnemyStates.Patrol;
 
-    public void SetState(EnemyStates state)
-    {
-        currentState = state;
-    }
+    public void SetState(EnemyStates state) => currentState = state;
     public EnemyStates GetState()
     {
         return currentState;
@@ -37,37 +34,6 @@ public class EnemyUnit : Unit
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
         GameEvents.instance.moveUnit += MoveUnit;
         animator = GetComponent<Animator>();
-    }
-
-    public void MoveUnit(Unit unit, Vector3 destination)
-    {
-        if (unit.gameObject == gameObject)
-        {
-            StartCoroutine(Move(destination));
-        }
-    }
-
-    public IEnumerator Move(Vector3 destination)
-    {
-        RotateTowards(destination);
-
-        moving = true;
-        while (transform.position != destination)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 6.00f);
-            yield return null;
-        }
-        moving = false;
-    }
-
-    private void RotateTowards(Vector3 destination)
-    {
-        //Get directional vector towards destination
-        Vector3 targetVector = new Vector3(destination.x - transform.position.x, 0, destination.z - transform.position.z);
-        //Calculate movement angle
-        float targetAngle = Mathf.Atan2(targetVector.x, targetVector.z) * Mathf.Rad2Deg;
-        //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.1f);
-        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
     }
 
     //If a player is within aggro range, change the current state

@@ -6,11 +6,6 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
-    Grid worldGrid;
-    Pathfinding pathfinding;
-    List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
-    bool canInput = true;
-
     #region State Machine Setup
 
     private States currentState;
@@ -18,14 +13,17 @@ public class BoardManager : MonoBehaviour
     {
         WaitingForPlayerInput,
         CalculateMovements,
-        MovingUnits,
-        EnemyAttackPhase,
-        ExtraPhase1,
-        ExtraPhase2
+        MoveUnits,
+        EnemyAttackPhase
     }
     public void ChangeState(States state) => currentState = state;
 
     #endregion
+
+    Grid worldGrid;
+    Pathfinding pathfinding;
+    List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
+    bool canInput = true;
 
     private void Start()
     {
@@ -34,29 +32,14 @@ public class BoardManager : MonoBehaviour
         GameEvents.instance.turnPass += TurnPass;
     }
 
-    private void TurnPass()
-    {
-        canInput = true;
-    }
-
     void Update()
     {
-        //Press B to "rest" a turn
-        if (canInput)
-        {
-            if (Input.GetKey(KeyCode.JoystickButton1))
-            {
-                canInput = false;
-                InitializeTurn();
-            }
-        }
-
-        
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
                 if (GetInputVector() != Vector3.zero)
                 {
+                    canInput = false;
                     //Desired player location
                     Vector3 desiredLocation = new Vector3(
                         PlayerUnit.instance.transform.position.x + GetInputVector().x,
@@ -74,11 +57,39 @@ public class BoardManager : MonoBehaviour
                         PlayerUnit.instance.SetDesiredNode(toCheck);
                         InitializeTurn();
                     }
+                    else
+                    {
+                        PlayerUnit.instance.RotateTowards(desiredLocation);
+                        canInput = true;
+                    }
                 }
+                //Press B to "rest" a turn
+                else if (canInput)
+                {
+                    if (Input.GetKey(KeyCode.JoystickButton1))
+                    {
+                        canInput = false;
+                        InitializeTurn();
+                    }
+                }
+                else if (canInput && Input.GetKeyDown(KeyCode.JoystickButton3))
+                {
+                    if (true)
+                    {
+                        if (objectAtWorldPoint(PlayerUnit.instance.transform.position + Vector3.forward, "Chest"))
+                        {
+                            if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
+                            {
+
+                            }
+                        }
+                    }
+                }
+
                 break;
             case States.CalculateMovements:
                 break;
-            case States.MovingUnits:
+            case States.MoveUnits:
                 //Once all units are done with their move, the next phase can begin
                 if (!AnyUnitsMoving())
                 {
@@ -121,9 +132,6 @@ public class BoardManager : MonoBehaviour
                     }
                 }
                 break;
-            case States.ExtraPhase2:
-
-                break;
             default:
                 break;
         }
@@ -164,7 +172,6 @@ public class BoardManager : MonoBehaviour
         //Calculate the desired nodes for patrol units
         SetPatrolUnitDesiredNodes();
 
-
         //Build list of units ready to be moved
         List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
 
@@ -175,7 +182,7 @@ public class BoardManager : MonoBehaviour
         }
 
         //Exit the state
-        ChangeState(States.MovingUnits);
+        ChangeState(States.MoveUnits);
     }
 
     //Calculate the desired nodes for patrol units
@@ -254,16 +261,22 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    private bool PlayerInAggroRange(Unit unit)
+    //Upon turn passing, allow inputs again
+    private void TurnPass()
     {
-        foreach (var item in unit.GetRange(unit.aggroRange))
+        canInput = true;
+    }
+
+    bool objectAtWorldPoint(Vector3 location, string tag)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(location, 0.1f);
+        foreach (var hitCollider in hitColliders)
         {
-            if (PlayerUnit.instance.transform.position == item)
+            if (hitCollider.gameObject.CompareTag(tag))
             {
                 return true;
             }
         }
         return false;
     }
-
 }

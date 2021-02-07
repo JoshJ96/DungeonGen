@@ -32,4 +32,19 @@ public class GameEvents : MonoBehaviour
     //Turn pass
     public event Action turnPass;
     public void TurnPass() => turnPass?.Invoke();
+
+    //Add an item to the inventory
+    public event Action<Item, int> addItem;
+    public void AddItem(Item toAdd, int amount) => addItem?.Invoke(toAdd, amount);
+
+    //Remove an item from the inventory
+
+    public event Action<Item, int> removeItem;
+    public void RemoveItem(Item toAdd, int amount) => removeItem?.Invoke(toAdd, amount);
+
+    //Remove an item from the inventory
+
+    public event Action<Item> useItem;
+    public void UseItem(Item toAdd) => useItem?.Invoke(toAdd);
+
 }
