@@ -4,19 +4,34 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class BoardManager : MonoBehaviour
+public partial class BoardManager : MonoBehaviour
 {
-    #region State Machine Setup
+    #region Board State Machine Setup
 
     private States currentState;
     public enum States
     {
         WaitingForPlayerInput,
-        CalculateMovements,
-        MoveUnits,
-        EnemyAttackPhase
+        CalculatingMovements,
+        WaitingForEnemyMovementEnd,
+        EnemyAttackPhase,
+        Looting
     }
     public void ChangeState(States state) => currentState = state;
+
+    #endregion
+
+    #region Input State Machine Setup
+
+    private PlayerInput playerInput = PlayerInput.None;
+    public enum PlayerInput
+    {
+        None,
+        Move,
+        Rest,
+        Loot
+    }
+    public void ChangeState(PlayerInput input) => playerInput = input;
 
     #endregion
 
@@ -37,104 +52,110 @@ public class BoardManager : MonoBehaviour
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
-                if (GetInputVector() != Vector3.zero)
-                {
-                    canInput = false;
-                    //Desired player location
-                    Vector3 desiredLocation = new Vector3(
-                        PlayerUnit.instance.transform.position.x + GetInputVector().x,
-                        0,
-                        PlayerUnit.instance.transform.position.z + GetInputVector().z);
-
-                    //Check the node at desiredLocation world point
-                    Node toCheck = worldGrid.NodeFromWorldPoint(desiredLocation);
-
-                    //If the node is walkable
-                    if (toCheck.walkable)
-                    {
-                        //Disable player input and set their desired node
-                        ChangeState(States.CalculateMovements);
-                        PlayerUnit.instance.SetDesiredNode(toCheck);
-                        InitializeTurn();
-                    }
-                    else
-                    {
-                        PlayerUnit.instance.RotateTowards(desiredLocation);
-                        canInput = true;
-                    }
-                }
-                //Press B to "rest" a turn
-                else if (canInput)
-                {
-                    if (Input.GetKey(KeyCode.JoystickButton1))
-                    {
-                        canInput = false;
-                        InitializeTurn();
-                    }
-                }
-                else if (canInput && Input.GetKeyDown(KeyCode.JoystickButton3))
-                {
-                    if (true)
-                    {
-                        if (objectAtWorldPoint(PlayerUnit.instance.transform.position + Vector3.forward, "Chest"))
-                        {
-                            if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
-                            {
-
-                            }
-                        }
-                    }
-                }
-
+                HandleWaitingForPlayerInput();
                 break;
-            case States.CalculateMovements:
-                break;
-            case States.MoveUnits:
-                //Once all units are done with their move, the next phase can begin
-                if (!AnyUnitsMoving())
-                {
-                    //Get ready and move to the attack phase
-                    GameEvents.instance.ScanForPlayerInAttackRange();
-
-                    //Grab list of enemy units in the "attackRange" state
-                    enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
-                    //todo: Sort by speeds and stuff could go here
-
-                    //If there's no enemies to attack the player, this phase is done
-                    if (enemyAttackingUnits.Count == 0)
-                    {
-                        //All units are done moving
-                        GameEvents.instance.TurnPass();
-                        currentState = States.WaitingForPlayerInput;
-                    }
-                    //If there is, it's time to order the turns of them
-                    else
-                    {
-                        enemyAttackingUnits[0].Attack(PlayerUnit.instance);
-                        currentState = States.EnemyAttackPhase;
-                    }
-                }
+            case States.WaitingForEnemyMovementEnd:
+                HandleWaitingForEnemyMovementEnd();
                 break;
             case States.EnemyAttackPhase:
-                if (!enemyAttackingUnits[0].isAttacking)
-                {
-                    enemyAttackingUnits.RemoveAt(0);
-                    if (enemyAttackingUnits.Count != 0)
-                    {
-                        enemyAttackingUnits[0].Attack(PlayerUnit.instance);
-                    }
-                    //If there's no enemies to attack the player, this phase is done
-                    else
-                    {
-                        //All units are done moving
-                        GameEvents.instance.TurnPass();
-                        currentState = States.WaitingForPlayerInput;
-                    }
-                }
+                HandleEnemyAttack();
                 break;
             default:
                 break;
         }
+    }
+
+    /**************************
+     * Player Action Handlers *
+     **************************/
+    private void HandleWaitingForPlayerInput()
+    {
+        if (canInput)
+        {
+            ReadForInputs();
+            switch (playerInput)
+            {
+                case PlayerInput.Move:
+                    HandlePlayerMovement();
+                    break;
+                case PlayerInput.Rest:
+                    HandleResting();
+                    break;
+                case PlayerInput.Loot:
+                    HandleLooting();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void HandlePlayerMovement()
+    {
+        canInput = false;
+        Vector3 desiredPlayerLocation = new Vector3(
+            PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
+            0,
+            PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+
+        Node checkNodeAtDesiredLocation = worldGrid.NodeFromWorldPoint(desiredPlayerLocation);
+
+        if (checkNodeAtDesiredLocation.walkable)
+        {
+            ChangeState(States.CalculatingMovements);
+            PlayerUnit.instance.SetDesiredNode(checkNodeAtDesiredLocation);
+            MoveEnemyUnits();
+        }
+        else
+        {
+            PlayerUnit.instance.RotateTowards(desiredPlayerLocation);
+            canInput = true;
+        }
+    }
+
+    private void HandleLooting()
+    {
+        if (objectAtWorldPoint(PlayerUnit.instance.transform.position + Vector3.forward, "Chest"))
+        {
+            if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
+            {
+                //Loot stuff
+            }
+        }
+    }
+
+    private void HandleResting()
+    {
+        ChangeState(States.CalculatingMovements);
+        canInput = false;
+        MoveEnemyUnits();
+    }
+
+    /**************************
+    * Enemy Action Handlers *
+    **************************/
+    private void MoveEnemyUnits()
+    {
+        //All enemy units will scan for player and change their states accordingly
+        GameEvents.instance.ScanForPlayerInAggroRange();
+
+        //Calculate the desired nodes for aggro units
+        SetAggroUnitDesiredNodes();
+
+        //Calculate the desired nodes for patrol units
+        SetPatrolUnitDesiredNodes();
+
+        //Build list of units ready to be moved
+        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
+
+        //Move all units
+        foreach (var unit in toMove)
+        {
+            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
+        }
+
+        //Exit the state
+        ChangeState(States.WaitingForEnemyMovementEnd);
     }
 
     private void SetAggroUnitDesiredNodes()
@@ -161,31 +182,6 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    void InitializeTurn()
-    {
-        //All enemy units will scan for player and change their states accordingly
-        GameEvents.instance.ScanForPlayerInAggroRange();
-
-        //Calculate the desired nodes for aggro units
-        SetAggroUnitDesiredNodes();
-
-        //Calculate the desired nodes for patrol units
-        SetPatrolUnitDesiredNodes();
-
-        //Build list of units ready to be moved
-        List<Unit> toMove = FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
-
-        //Move all units
-        foreach (var unit in toMove)
-        {
-            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
-        }
-
-        //Exit the state
-        ChangeState(States.MoveUnits);
-    }
-
-    //Calculate the desired nodes for patrol units
     private void SetPatrolUnitDesiredNodes()
     {
         //Grab list of enemy units in the "patrol" state
@@ -218,65 +214,50 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    /*******************************************************
-    ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
-    ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝
-    ███████║█████╗░░██║░░░░░██████╔╝█████╗░░██████╔╝╚█████╗░
-    ██╔══██║██╔══╝░░██║░░░░░██╔═══╝░██╔══╝░░██╔══██╗░╚═══██╗
-    ██║░░██║███████╗███████╗██║░░░░░███████╗██║░░██║██████╔╝
-    ╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═════╝░
-     *******************************************************/
-
-    //Builds vector3 based on horizontal and vertical inputs
-    private Vector3 GetInputVector()
+    private void HandleEnemyAttack()
     {
-        return new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-    }
-
-    //Scans all units in the room and checks if they're moving
-    private bool AnyUnitsMoving()
-    {
-        List<Unit> units = FindObjectsOfType<Unit>().ToList();
-        foreach (var unit in units)
+        if (!enemyAttackingUnits[0].isAttacking)
         {
-            if (unit.moving)
+            enemyAttackingUnits.RemoveAt(0);
+            if (enemyAttackingUnits.Count != 0)
             {
-                return true;
+                enemyAttackingUnits[0].Attack(PlayerUnit.instance);
+            }
+            //If there's no enemies to attack the player, this phase is done
+            else
+            {
+                //All units are done moving
+                GameEvents.instance.TurnPass();
+                currentState = States.WaitingForPlayerInput;
             }
         }
-        return false;
     }
 
-    //Scans all units in the room and checks if any desired nodes collide
-    private bool IsDuplicateDesiredNode(Node toCheck)
+    private void HandleWaitingForEnemyMovementEnd()
     {
-        List<Unit> units = GameObject.FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
-        foreach (var item in units)
+        //Once all units are done with their move, the next phase can begin
+        if (!AnyUnitsMoving())
         {
-            if (toCheck.worldPosition == item.GetDesiredNode().worldPosition)
+            //Get ready and move to the attack phase
+            GameEvents.instance.ScanForPlayerInAttackRange();
+
+            //Grab list of enemy units in the "attackRange" state
+            enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();
+            //todo: Sort by speeds and stuff could go here
+
+            //If there's no enemies to attack the player, this phase is done
+            if (enemyAttackingUnits.Count == 0)
             {
-                return true;
+                //All units are done moving
+                GameEvents.instance.TurnPass();
+                currentState = States.WaitingForPlayerInput;
+            }
+            //If there is, it's time to order the turns of them
+            else
+            {
+                enemyAttackingUnits[0].Attack(PlayerUnit.instance);
+                currentState = States.EnemyAttackPhase;
             }
         }
-        return false;
-    }
-
-    //Upon turn passing, allow inputs again
-    private void TurnPass()
-    {
-        canInput = true;
-    }
-
-    bool objectAtWorldPoint(Vector3 location, string tag)
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(location, 0.1f);
-        foreach (var hitCollider in hitColliders)
-        {
-            if (hitCollider.gameObject.CompareTag(tag))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

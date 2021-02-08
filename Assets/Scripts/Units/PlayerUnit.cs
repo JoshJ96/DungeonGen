@@ -13,20 +13,8 @@ public class PlayerUnit : Unit
     }
     #endregion
 
-    public Animator animator;
-
     private void Start()
     {
         GameEvents.instance.moveUnit += MoveUnit;
-    }
-
-    private void Update()
-    {
-        animator.SetFloat("Blend", GetInputVector().normalized.magnitude);
-    }
-    
-    private Vector3 GetInputVector()
-    {
-        return new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
     }
 }
