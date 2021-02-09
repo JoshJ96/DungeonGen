@@ -18,7 +18,7 @@ public partial class BoardManager : MonoBehaviour
     //Builds vector3 based on horizontal and vertical inputs
     private Vector3 GetInputVector()
     {
-        return new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        return new Vector3(Mathf.RoundToInt(Input.GetAxisRaw("Horizontal")), 0, Mathf.RoundToInt(Input.GetAxisRaw("Vertical")));
     }
 
     //Scans all units in the room and checks if they're moving
@@ -70,22 +70,40 @@ public partial class BoardManager : MonoBehaviour
 
     private void ReadForInputs()
     {
+        //Rotation mode key pressed
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetAxisRaw("Left Trigger") != 0)
+        {
+            playerInput = PlayerInput.RotateMode;
+        }
+
+        //Diagonal mode key pressed
+        else if (Input.GetKey(KeyCode.JoystickButton4))
+        {
+        
+        }
+
         //Movement key(s) pressed
-        if (GetInputVector() != Vector3.zero)
+        else if (GetInputVector() != Vector3.zero)
         {
             playerInput = PlayerInput.Move;
         }
 
         //Rest key pressed
-        else if (Input.GetKey(KeyCode.JoystickButton1))
+        else if (Input.GetKey(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.Q))
         {
             playerInput = PlayerInput.Rest;
         }
 
         //Loot key pressed
-        else if (Input.GetKeyDown(KeyCode.JoystickButton3))
+        else if (Input.GetKeyDown(KeyCode.JoystickButton3) || Input.GetKeyDown(KeyCode.E))
         {
             playerInput = PlayerInput.Loot;
+        }
+
+        //Primary attack key pressed
+        else if (Input.GetKeyDown(KeyCode.JoystickButton2) || Input.GetMouseButtonDown(0))
+        {
+            playerInput = PlayerInput.PrimaryAttack;
         }
 
         //No key pressed

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public partial class BoardManager : MonoBehaviour
@@ -29,7 +30,10 @@ public partial class BoardManager : MonoBehaviour
         None,
         Move,
         Rest,
-        Loot
+        Loot,
+        PrimaryAttack,
+        RotateMode,
+        DiagonalMode
     }
     public void ChangeState(PlayerInput input) => playerInput = input;
 
@@ -84,6 +88,9 @@ public partial class BoardManager : MonoBehaviour
                 case PlayerInput.Loot:
                     HandleLooting();
                     break;
+                case PlayerInput.RotateMode:
+                    HandleRotateMode();
+                    break;
                 default:
                     break;
             }
@@ -130,6 +137,18 @@ public partial class BoardManager : MonoBehaviour
         ChangeState(States.CalculatingMovements);
         canInput = false;
         MoveEnemyUnits();
+    }
+
+    private void HandleRotateMode()
+    {
+        //Todo: auto-rotate towards an enemy if around 3x3
+
+        Vector3 rotateTowards = new Vector3(
+            PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
+            0,
+            PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+
+        PlayerUnit.instance.RotateTowards(rotateTowards);
     }
 
     /**************************
