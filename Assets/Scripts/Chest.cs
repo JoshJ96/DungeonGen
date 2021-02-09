@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +7,12 @@ public class Chest : MonoBehaviour
     public List<Vector3> interactTiles = new List<Vector3> { };
     public Animator animator;
 
-    void Update()
+    private void Start()
+    {
+        GameEvents.instance.turnPass += TurnPass;
+    }
+
+    private void TurnPass()
     {
         foreach (Vector3 tile in interactTiles)
         {

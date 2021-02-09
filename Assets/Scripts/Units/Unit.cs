@@ -120,7 +120,7 @@ public class Unit : MonoBehaviour
         }
 
         //Get directional vector towards destination
-        Vector3 targetVector = new Vector3(destination.x - transform.position.x, 0, destination.z - transform.position.z).normalized;
+        Vector3 targetVector = new Vector3(Mathf.RoundToInt(destination.x - transform.position.x), 0, Mathf.RoundToInt(destination.z - transform.position.z));
 
         //Change the enumeration
         foreach (var item in directions)

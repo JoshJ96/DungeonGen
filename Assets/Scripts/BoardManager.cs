@@ -110,6 +110,7 @@ public partial class BoardManager : MonoBehaviour
         {
             PlayerUnit.instance.RotateTowards(desiredPlayerLocation);
             canInput = true;
+            GameEvents.instance.TurnPass();
         }
     }
 
