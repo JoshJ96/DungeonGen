@@ -17,7 +17,8 @@ public class Chest : MonoBehaviour
         foreach (Vector3 tile in interactTiles)
         {
             Vector3 check = transform.position + tile;
-            if (PlayerUnit.instance.transform.position == check)
+            if (PlayerUnit.instance.transform.position.x == check.x
+                && PlayerUnit.instance.transform.position.z == check.z)
             {
                 if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
                 {

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class EnemyUnit : Unit
@@ -24,7 +25,6 @@ public class EnemyUnit : Unit
 
     #endregion
 
-    public bool isAttacking = false;
     Animator animator;
 
 
@@ -41,7 +41,8 @@ public class EnemyUnit : Unit
     {
         foreach (Vector3 position in GetRange(aggroRange))
         {
-            if (PlayerUnit.instance.transform.position == position)
+            if (   PlayerUnit.instance.transform.position.x == position.x
+                && PlayerUnit.instance.transform.position.z == position.z)
             {
                 SetState(EnemyStates.TargetingPlayer);
                 return;
@@ -54,7 +55,8 @@ public class EnemyUnit : Unit
     {
         foreach (Vector3 position in GetRange(attackRange))
         {
-            if (PlayerUnit.instance.transform.position == position)
+            if (   PlayerUnit.instance.transform.position.x == position.x
+                && PlayerUnit.instance.transform.position.z == position.z)
             {
                 SetState(EnemyStates.PlayerInAttackRange);
                 return;
@@ -66,7 +68,7 @@ public class EnemyUnit : Unit
     public void Attack(Unit toAttack)
     {
         RotateTowards(toAttack.transform.position);
-        int randomDamage = UnityEngine.Random.Range(0, 10);
+        int randomDamage = UnityEngine.Random.Range(1, 10);
         GameEvents.instance.DoDamage(this, toAttack, randomDamage);
         StartCoroutine(PerformAttack());
     }
@@ -75,7 +77,7 @@ public class EnemyUnit : Unit
     {
         animator.SetBool("Attacking", true);
         isAttacking = true;
-        yield return new WaitForSeconds(1.00f);
+        yield return new WaitForSeconds(0.5f);
         isAttacking = false;
         animator.SetBool("Attacking", false);
     }

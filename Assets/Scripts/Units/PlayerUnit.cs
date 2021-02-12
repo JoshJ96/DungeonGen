@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerUnit : Unit
@@ -13,8 +14,64 @@ public class PlayerUnit : Unit
     }
     #endregion
 
+    public Animator animator;
+    List<Unit> attackTargets = new List<Unit>();
+
     private void Start()
     {
         GameEvents.instance.moveUnit += MoveUnit;
+    }
+
+    public void Attack()
+    {
+        isAttacking = true;
+        //Get tile to check
+        Vector3 tileToCheck = Vector3.zero;
+        foreach (var item in directions)
+        {
+            if (item.Key == this.facingDirection)
+            {
+                tileToCheck = item.Value + transform.position;
+            }
+        }
+        List<Unit> units = FindObjectsOfType<Unit>().ToList();
+        foreach (var unit in units)
+        {
+            if (   unit.transform.position.x == tileToCheck.x
+                && unit.transform.position.z == tileToCheck.z)
+            {
+                print($"Sending an attack to {unit.gameObject.name}");
+                attackTargets.Add(unit);
+            }
+        }
+        //If no enemies in target range
+        print($"Tried sending an attack to {tileToCheck}");
+        StartCoroutine(NormalAttackEnum());
+
+    }
+
+    IEnumerator NormalAttackEnum()
+    {
+        animator.SetTrigger("Attacking");
+        yield return null;
+    }
+
+    /*************************
+     * ANIMATION EVENTS ONLY *
+     *************************/
+    void Anim_EndAttack()
+    {
+        animator.SetTrigger("Attacking");
+        isAttacking = false;
+    }
+    void Anim_DealDamage()
+    {
+        if (attackTargets.Count != 0)
+        {
+            int randomDamage = UnityEngine.Random.Range(1, 10);
+            GameEvents.instance.DoDamage(this, attackTargets[0], randomDamage);
+        }
+
+        attackTargets.Clear();
     }
 }

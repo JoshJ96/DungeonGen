@@ -18,7 +18,7 @@ public class Unit : MonoBehaviour
         Northwest
     }
 
-    Dictionary<Direction, Vector3> directions = new Dictionary<Direction, Vector3>
+    public Dictionary<Direction, Vector3> directions = new Dictionary<Direction, Vector3>
     {
         { Direction.North,      new Vector3(0,0,1)   },
         { Direction.Northeast,  new Vector3(1,0,1)   },
@@ -30,7 +30,7 @@ public class Unit : MonoBehaviour
         { Direction.Northwest,  new Vector3(-1,0,1)  }
     };
 
-    Direction facingDirection;
+    public Direction facingDirection;
 
     public Direction GetDirection()
     {
@@ -51,6 +51,9 @@ public class Unit : MonoBehaviour
 
     //Control (used in Board Manager)
     public bool moving = false;
+    public bool isAttacking = false;
+
+    public int hitpoints;
 
 
     //Build a range of nodes from the distance given (used for aggro/attack ranges)
@@ -92,6 +95,7 @@ public class Unit : MonoBehaviour
 
     public void MoveUnit(Unit unit, Vector3 destination)
     {
+        destination = new Vector3(destination.x, transform.position.y, destination.z);
         if (unit.gameObject == gameObject)
         {
             StartCoroutine(Move(destination));

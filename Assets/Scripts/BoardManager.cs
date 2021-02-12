@@ -9,14 +9,15 @@ public partial class BoardManager : MonoBehaviour
 {
     #region Board State Machine Setup
 
-    private States currentState;
+    private States currentState = States.WaitingForPlayerInput;
     public enum States
     {
         WaitingForPlayerInput,
         CalculatingMovements,
         WaitingForEnemyMovementEnd,
         EnemyAttackPhase,
-        Looting
+        Looting,
+        WaitingForPlayerAttackEnd
     }
     public void ChangeState(States state) => currentState = state;
 
@@ -43,12 +44,20 @@ public partial class BoardManager : MonoBehaviour
     Pathfinding pathfinding;
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
     bool canInput = true;
+    public GameObject damageIndicatorObject;
 
     private void Start()
     {
         worldGrid = GetComponent<Grid>();
         pathfinding = GetComponent<Pathfinding>();
         GameEvents.instance.turnPass += TurnPass;
+        GameEvents.instance.doDamage += DoDamage;
+    }
+
+    private void DoDamage(Unit doingDamage, Unit takingDamage, int amount)
+    {
+        GameObject damageIndicator = Instantiate(damageIndicatorObject, takingDamage.transform.position + Vector3.up, Quaternion.identity);
+        damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
     }
 
     void Update()
@@ -56,7 +65,30 @@ public partial class BoardManager : MonoBehaviour
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
-                HandleWaitingForPlayerInput();
+                if (canInput)
+                {
+                    ReadForInputs();
+                    switch (playerInput)
+                    {
+                        case PlayerInput.Move:
+                            HandlePlayerMovement();
+                            break;
+                        case PlayerInput.Rest:
+                            HandleResting();
+                            break;
+                        case PlayerInput.Loot:
+                            HandleLooting();
+                            break;
+                        case PlayerInput.RotateMode:
+                            HandleRotateMode();
+                            break;
+                        case PlayerInput.PrimaryAttack:
+                            HandlePlayerAttack();
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
             case States.WaitingForEnemyMovementEnd:
                 HandleWaitingForEnemyMovementEnd();
@@ -64,37 +96,30 @@ public partial class BoardManager : MonoBehaviour
             case States.EnemyAttackPhase:
                 HandleEnemyAttack();
                 break;
+            case States.WaitingForPlayerAttackEnd:
+                HandleWaitingForPlayerAttackEnd();
+                break;
             default:
                 break;
         }
     }
 
-    /**************************
-     * Player Action Handlers *
-     **************************/
-    private void HandleWaitingForPlayerInput()
+    private void HandleWaitingForPlayerAttackEnd()
     {
-        if (canInput)
+        canInput = false;
+        if (!PlayerUnit.instance.isAttacking)
         {
-            ReadForInputs();
-            switch (playerInput)
-            {
-                case PlayerInput.Move:
-                    HandlePlayerMovement();
-                    break;
-                case PlayerInput.Rest:
-                    HandleResting();
-                    break;
-                case PlayerInput.Loot:
-                    HandleLooting();
-                    break;
-                case PlayerInput.RotateMode:
-                    HandleRotateMode();
-                    break;
-                default:
-                    break;
-            }
+            ChangeState(States.CalculatingMovements);
+            MoveEnemyUnits();
         }
+    }
+
+    private void HandlePlayerAttack()
+    {
+        canInput = false;
+        currentState = States.WaitingForPlayerAttackEnd;
+        PlayerUnit.instance.isAttacking = true;
+        PlayerUnit.instance.Attack();
     }
 
     private void HandlePlayerMovement()
@@ -142,7 +167,10 @@ public partial class BoardManager : MonoBehaviour
     private void HandleRotateMode()
     {
         //Todo: auto-rotate towards an enemy if around 3x3
-
+        if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
+        {
+            return;
+        }
         Vector3 rotateTowards = new Vector3(
             PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
             0,
