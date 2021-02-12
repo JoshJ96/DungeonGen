@@ -70,8 +70,14 @@ public class PlayerUnit : Unit
     {
         if (attackTargets.Count != 0)
         {
-            int randomDamage = UnityEngine.Random.Range(1, 10);
-            GameEvents.instance.DoDamage(this, attackTargets[0], randomDamage);
+            foreach (var target in attackTargets)
+            {
+                EnemyUnit takingDamage = target.GetComponent<EnemyUnit>();
+                int randomDamage = UnityEngine.Random.Range(1, 10);
+                GameEvents.instance.DoDamage(this, target, randomDamage);
+                takingDamage.SetCurrentHitpoints(takingDamage.GetCurrentHitpoints() - randomDamage);
+            }
+
         }
 
         attackTargets.Clear();

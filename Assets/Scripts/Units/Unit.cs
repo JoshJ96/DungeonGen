@@ -57,8 +57,6 @@ public class Unit : MonoBehaviour
     public bool moving = false;
     public bool isAttacking = false;
 
-    public int hitpoints;
-
     //Build a range of nodes from the distance given (used for aggro/attack ranges)
     public List<Vector3> GetRange(int distance)
     {

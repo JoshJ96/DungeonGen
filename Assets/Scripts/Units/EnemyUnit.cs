@@ -27,13 +27,26 @@ public class EnemyUnit : Unit
 
     Animator animator;
 
+    public int maxHitpoints;
+    private int currentHitpoints;
+    public int GetCurrentHitpoints() => currentHitpoints;
+    public void SetCurrentHitpoints(int hp) => currentHitpoints = hp;
 
     private void Start()
     {
+        currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
         GameEvents.instance.moveUnit += MoveUnit;
         animator = GetComponent<Animator>();
+    }
+
+    private void Update()
+    {
+        if (currentHitpoints <= 0)
+        {
+            Destroy(this);
+        }
     }
 
     //If a player is within aggro range, change the current state
