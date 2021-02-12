@@ -19,6 +19,7 @@ public class PlayerUnit : Unit
 
     private void Start()
     {
+        SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
         GameEvents.instance.moveUnit += MoveUnit;
     }
 
@@ -27,6 +28,8 @@ public class PlayerUnit : Unit
         isAttacking = true;
         //Get tile to check
         Vector3 tileToCheck = Vector3.zero;
+
+        //Take the facing direction and send the attack towards that direction
         foreach (var item in directions)
         {
             if (item.Key == this.facingDirection)
@@ -37,8 +40,7 @@ public class PlayerUnit : Unit
         List<Unit> units = FindObjectsOfType<Unit>().ToList();
         foreach (var unit in units)
         {
-            if (   unit.transform.position.x == tileToCheck.x
-                && unit.transform.position.z == tileToCheck.z)
+            if (unit.GetCurrentNode().worldPosition == Grid.instance.NodeFromWorldPoint(tileToCheck).worldPosition)
             {
                 print($"Sending an attack to {unit.gameObject.name}");
                 attackTargets.Add(unit);

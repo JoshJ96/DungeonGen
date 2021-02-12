@@ -104,6 +104,10 @@ public partial class BoardManager : MonoBehaviour
         }
     }
 
+    /*************************
+    * Player Action Handlers *
+    **************************/
+
     private void HandleWaitingForPlayerAttackEnd()
     {
         canInput = false;
@@ -125,22 +129,23 @@ public partial class BoardManager : MonoBehaviour
     private void HandlePlayerMovement()
     {
         canInput = false;
-        Vector3 desiredPlayerLocation = new Vector3(
-            PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
-            0,
-            PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+        Node currentPlayerNode = PlayerUnit.instance.GetCurrentNode();
+        Node desiredNodeLocation = worldGrid.grid[
+            currentPlayerNode.gridX + Mathf.RoundToInt(GetInputVector().x),
+            currentPlayerNode.gridY + Mathf.RoundToInt(GetInputVector().z)
+            ];
 
-        Node checkNodeAtDesiredLocation = worldGrid.NodeFromWorldPoint(desiredPlayerLocation);
+        //Node checkNodeAtDesiredLocation = worldGrid.NodeFromWorldPoint(desiredPlayerLocation);
 
-        if (checkNodeAtDesiredLocation.walkable)
+        if (desiredNodeLocation.walkable)
         {
             ChangeState(States.CalculatingMovements);
-            PlayerUnit.instance.SetDesiredNode(checkNodeAtDesiredLocation);
+            PlayerUnit.instance.SetDesiredNode(desiredNodeLocation);
             MoveEnemyUnits();
         }
         else
         {
-            PlayerUnit.instance.RotateTowards(desiredPlayerLocation);
+            PlayerUnit.instance.RotateTowards(desiredNodeLocation.worldPosition);
             canInput = true;
             GameEvents.instance.TurnPass();
         }
@@ -179,9 +184,9 @@ public partial class BoardManager : MonoBehaviour
         PlayerUnit.instance.RotateTowards(rotateTowards);
     }
 
-    /**************************
+    /************************
     * Enemy Action Handlers *
-    **************************/
+    *************************/
     private void MoveEnemyUnits()
     {
         //All enemy units will scan for player and change their states accordingly

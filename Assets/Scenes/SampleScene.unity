@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &81510634
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -757,6 +757,9 @@ MonoBehaviour:
   - {x: -0.5, y: 0, z: -1}
   - {x: 0.5, y: 0, z: -1}
   animator: {fileID: 1667478134}
+  mesh:
+  - {fileID: 1667478133}
+  - {fileID: 576297146}
 --- !u!1 &662337174 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5959008039774194699, guid: 760fbc476e8f3854c9d977fc0f1f592f,

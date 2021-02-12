@@ -4,16 +4,19 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
+	//Singleton
+	public static Grid instance;
 	public LayerMask unwalkableMask;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
-	Node[,] grid;
+	public Node[,] grid;
 
 	float nodeDiameter;
 	int gridSizeX, gridSizeY;
 
 	void Awake()
 	{
+		instance = this;
 		nodeDiameter = nodeRadius * 2;
 		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
@@ -64,7 +67,6 @@ public class Grid : MonoBehaviour
 
 		return neighbours;
 	}
-
 
 	public Node NodeFromWorldPoint(Vector3 worldPosition)
 	{
