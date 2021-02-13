@@ -70,55 +70,52 @@ public partial class BoardManager : MonoBehaviour
 
     private void ReadForInputs()
     {
-        //Rotation mode key pressed
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetAxisRaw("Left Trigger") != 0)
+        //Primary attack key pressed
+        if (Input.GetKeyDown(KeyCode.JoystickButton2) || Input.GetMouseButtonDown(0))
         {
-            if (playerInput != PlayerInput.RotateMode)
-            {
-                arrow8Dir.SetTrigger("DisplayArrows");
-            }
-            playerInput = PlayerInput.RotateMode;
+            ChangeState(PlayerInput.PrimaryAttack);
+            return;
+        }
+
+        //Rotation mode key pressed
+        else if (Input.GetKey(KeyCode.LeftShift) || Input.GetAxisRaw("Left Trigger") != 0)
+        {
+            ChangeState(PlayerInput.RotateMode);
             return;
         }
 
         //Diagonal mode key pressed
         else if (Input.GetKey(KeyCode.JoystickButton4))
         {
+            ChangeState(PlayerInput.DiagonalMode);
             return;
         }
 
         //Movement key(s) pressed
         else if (GetInputVector() != Vector3.zero)
         {
-            playerInput = PlayerInput.Move;
+            ChangeState(PlayerInput.Move);
             return;
         }
 
         //Rest key pressed
         else if (Input.GetKey(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.Q))
         {
-            playerInput = PlayerInput.Rest;
+            ChangeState(PlayerInput.Rest);
             return;
         }
 
         //Loot key pressed
         else if (Input.GetKeyDown(KeyCode.JoystickButton3) || Input.GetKeyDown(KeyCode.E))
         {
-            playerInput = PlayerInput.Loot;
-            return;
-        }
-
-        //Primary attack key pressed
-        else if (Input.GetKeyDown(KeyCode.JoystickButton2) || Input.GetMouseButtonDown(0))
-        {
-            playerInput = PlayerInput.PrimaryAttack;
+            ChangeState(PlayerInput.Loot);
             return;
         }
 
         //No key pressed
         else
         {
-            playerInput = PlayerInput.None;
+            ChangeState(PlayerInput.None);
             return;
         }
     }

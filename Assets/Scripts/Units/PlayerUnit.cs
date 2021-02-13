@@ -16,10 +16,25 @@ public class PlayerUnit : Unit
 
     public Animator animator;
     List<Unit> attackTargets = new List<Unit>();
+    float blendValue;
 
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
+    }
+
+    private void Update()
+    {
+        if (moving)
+        {
+            blendValue = 1.0f;
+        }
+        else
+        {
+            blendValue -= 2 * Time.deltaTime;
+            blendValue = Mathf.Clamp(blendValue, 0, 1);
+        }
+        animator.SetFloat("Blend", blendValue);
     }
 
     public void Attack()

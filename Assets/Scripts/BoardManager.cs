@@ -36,7 +36,18 @@ public partial class BoardManager : MonoBehaviour
         RotateMode,
         DiagonalMode
     }
-    public void ChangeState(PlayerInput input) => playerInput = input;
+    public void ChangeState(PlayerInput input)
+    {
+        if (input == PlayerInput.RotateMode)
+        {
+            arrow8Dir.SetTrigger("DisplayArrows");
+        }
+        else
+        {
+            arrow8Dir.SetTrigger("DisableArrows");
+        }
+        playerInput = input;
+    }
 
     #endregion
 
@@ -119,6 +130,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleWaitingForPlayerAttackEnd()
     {
+        arrow8Dir.SetTrigger("DisableArrows");
         canInput = false;
         if (!PlayerUnit.instance.isAttacking)
         {
@@ -178,16 +190,17 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleRotateMode()
     {
-        //Todo: auto-rotate towards an enemy if around 3x3
-        if (Input.GetAxisRaw("Horizontal") != 0 && Input.GetAxisRaw("Vertical") != 0)
-        {
-            Vector3 rotateTowards = new Vector3(
-                PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
-                0,
-                PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+        if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
+            return;
 
-            PlayerUnit.instance.RotateTowards(rotateTowards);
-        }
+        //Todo: auto-rotate towards an enemy if around 3x3
+        Vector3 rotateTowards = new Vector3(
+            PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
+            0,
+            PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+
+        PlayerUnit.instance.RotateTowards(rotateTowards);
+        
     }
 
     /************************
@@ -278,6 +291,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleEnemyAttack()
     {
+        arrow8Dir.SetTrigger("DisableArrows");
         if (!enemyAttackingUnits[0].isAttacking)
         {
             enemyAttackingUnits.RemoveAt(0);
@@ -297,6 +311,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleWaitingForEnemyMovementEnd()
     {
+        arrow8Dir.SetTrigger("DisableArrows");
         //Once all units are done with their move, the next phase can begin
         if (!AnyUnitsMoving())
         {
