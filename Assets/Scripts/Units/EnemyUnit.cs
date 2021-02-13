@@ -34,6 +34,7 @@ public class EnemyUnit : Unit
 
     private void Start()
     {
+        SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;

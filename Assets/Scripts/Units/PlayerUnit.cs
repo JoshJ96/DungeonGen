@@ -36,9 +36,11 @@ public class PlayerUnit : Unit
                 tileToCheck = item.Value + transform.position;
             }
         }
-        List<Unit> units = FindObjectsOfType<Unit>().ToList();
-        foreach (var unit in units)
+        foreach (var unit in FindObjectsOfType<Unit>())
         {
+            var hi = unit.GetCurrentNode();
+            var hi2 = Grid.instance.NodeFromWorldPoint(tileToCheck);
+
             if (unit.GetCurrentNode().worldPosition == Grid.instance.NodeFromWorldPoint(tileToCheck).worldPosition)
             {
                 print($"Sending an attack to {unit.gameObject.name}");
