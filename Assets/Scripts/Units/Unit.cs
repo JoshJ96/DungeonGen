@@ -60,6 +60,7 @@ public class Unit : MonoBehaviour
     //Build a range of nodes from the distance given (used for aggro/attack ranges)
     public List<Vector3> GetRange(int distance)
     {
+
         //Initialize List
         List<Vector3> range = new List<Vector3>();
 
@@ -94,13 +95,10 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public void MoveUnit(Unit unit, Vector3 destination)
+    public void MoveUnit(Vector3 destination)
     {
         destination = new Vector3(destination.x, transform.position.y, destination.z);
-        if (unit.gameObject == gameObject)
-        {
-            StartCoroutine(Move(destination));
-        }
+        StartCoroutine(Move(destination));
     }
 
     public IEnumerator Move(Vector3 destination)

@@ -20,7 +20,6 @@ public class PlayerUnit : Unit
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
-        GameEvents.instance.moveUnit += MoveUnit;
     }
 
     public void Attack()

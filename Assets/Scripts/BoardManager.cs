@@ -190,7 +190,10 @@ public partial class BoardManager : MonoBehaviour
     private void MoveEnemyUnits()
     {
         //All enemy units will scan for player and change their states accordingly
-        GameEvents.instance.ScanForPlayerInAggroRange();
+        foreach (EnemyUnit unit in FindObjectsOfType<EnemyUnit>())
+        {
+            unit.ScanForPlayerInAggroRange();
+        }
 
         //Calculate the desired nodes for aggro units
         SetAggroUnitDesiredNodes();
@@ -204,7 +207,7 @@ public partial class BoardManager : MonoBehaviour
         //Move all units
         foreach (var unit in toMove)
         {
-            GameEvents.instance.MoveUnit(unit, unit.GetDesiredNode().worldPosition);
+            unit.MoveUnit(unit.GetDesiredNode().worldPosition);
         }
 
         //Exit the state
@@ -292,7 +295,10 @@ public partial class BoardManager : MonoBehaviour
         if (!AnyUnitsMoving())
         {
             //Get ready and move to the attack phase
-            GameEvents.instance.ScanForPlayerInAttackRange();
+            foreach (EnemyUnit unit in FindObjectsOfType<EnemyUnit>())
+            {
+                unit.ScanForPlayerInAttackRange();
+            }
 
             //Grab list of enemy units in the "attackRange" state
             enemyAttackingUnits = FindObjectsOfType<EnemyUnit>().Where(x => x.GetState() == EnemyUnit.EnemyStates.PlayerInAttackRange).ToList();

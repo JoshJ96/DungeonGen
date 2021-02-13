@@ -37,20 +37,19 @@ public class EnemyUnit : Unit
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
-        GameEvents.instance.moveUnit += MoveUnit;
         animator = GetComponent<Animator>();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (currentHitpoints <= 0)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
     }
 
     //If a player is within aggro range, change the current state
-    private void ScanForPlayerInAggroRange()
+    public void ScanForPlayerInAggroRange()
     {
         foreach (Vector3 position in GetRange(aggroRange))
         {
@@ -64,7 +63,7 @@ public class EnemyUnit : Unit
         SetState(EnemyStates.Patrol);
     }
 
-    private void ScanForPlayerInAttackRange()
+    public void ScanForPlayerInAttackRange()
     {
         foreach (Vector3 position in GetRange(attackRange))
         {
