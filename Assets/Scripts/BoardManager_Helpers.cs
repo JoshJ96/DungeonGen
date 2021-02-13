@@ -73,6 +73,10 @@ public partial class BoardManager : MonoBehaviour
         //Rotation mode key pressed
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetAxisRaw("Left Trigger") != 0)
         {
+            if (playerInput != PlayerInput.RotateMode)
+            {
+                arrow8Dir.SetTrigger("DisplayArrows");
+            }
             playerInput = PlayerInput.RotateMode;
             return;
         }

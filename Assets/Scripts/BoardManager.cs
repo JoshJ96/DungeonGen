@@ -45,6 +45,7 @@ public partial class BoardManager : MonoBehaviour
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
     bool canInput = true;
     public GameObject damageIndicatorObject;
+    public Animator arrow8Dir;
 
     private void Start()
     {
@@ -56,8 +57,16 @@ public partial class BoardManager : MonoBehaviour
 
     private void DoDamage(Unit doingDamage, Unit takingDamage, int amount)
     {
-        GameObject damageIndicator = Instantiate(damageIndicatorObject, takingDamage.transform.position + Vector3.up, Quaternion.identity);
-        damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
+        foreach (Transform item in takingDamage.gameObject.transform)
+        {
+            if (item.CompareTag("Overhead Location"))
+            {
+                GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(90,0,0)));
+
+                damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
+                return;
+            }
+        }
     }
 
     void Update()
@@ -170,16 +179,15 @@ public partial class BoardManager : MonoBehaviour
     private void HandleRotateMode()
     {
         //Todo: auto-rotate towards an enemy if around 3x3
-        if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
+        if (Input.GetAxisRaw("Horizontal") != 0 && Input.GetAxisRaw("Vertical") != 0)
         {
-            return;
-        }
-        Vector3 rotateTowards = new Vector3(
-            PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
-            0,
-            PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
+            Vector3 rotateTowards = new Vector3(
+                PlayerUnit.instance.transform.position.x + Mathf.RoundToInt(GetInputVector().x),
+                0,
+                PlayerUnit.instance.transform.position.z + Mathf.RoundToInt(GetInputVector().z));
 
-        PlayerUnit.instance.RotateTowards(rotateTowards);
+            PlayerUnit.instance.RotateTowards(rotateTowards);
+        }
     }
 
     /************************

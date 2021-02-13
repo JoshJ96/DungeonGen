@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Chest
+  - Overhead Location
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Solid
   - Player
   - Post Processing
-  - 
+  - Overhead Location
   - 
   - 
   - 

@@ -46,7 +46,7 @@ public class Grid_GFX : MonoBehaviour
         foreach (Node node in Grid.instance.grid)
         {
             GL.Begin(GL.LINES);
-            GL.Color(new Color(0, 0, 0, 0.3f));
+            GL.Color(new Color(0, 0, 0, 0.1f));
             foreach (EnemyUnit enemyUnit in hi)
             {
                 if (enemyUnit.GetCurrentNode().worldPosition == node.worldPosition)
