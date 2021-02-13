@@ -108,7 +108,7 @@ public class Unit : MonoBehaviour
         moving = true;
         while (transform.position != destination)
         {
-            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5.00f);
+            transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 7.00f);
             yield return null;
         }
         moving = false;
