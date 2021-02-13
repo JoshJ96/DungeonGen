@@ -9,15 +9,29 @@ public class BasicCameraMovement : MonoBehaviour
     [Range(0, 20)]
     public float smoothSpeed;
 
+    private void Start()
+    {
+        transform.position = new Vector3(
+                target.transform.position.x,
+                transform.position.y,
+                target.transform.position.z) + offset;
+    }
+
     void Update()
     {
         Vector3 startVector = transform.position;
-        Vector3 destVector = new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z);
-
-
-        if (startVector != destVector + offset)
+        if (PlayerUnit.instance.GetDesiredNode() != null)
         {
-            transform.position = Vector3.Lerp(startVector, destVector + offset, smoothSpeed * Time.deltaTime);
+            Vector3 destVector = new Vector3(
+                PlayerUnit.instance.GetDesiredNode().worldPosition.x,
+                transform.position.y,
+                PlayerUnit.instance.GetDesiredNode().worldPosition.z
+            );
+
+            if (startVector != destVector + offset)
+            {
+                transform.position = Vector3.Lerp(startVector, destVector + offset, smoothSpeed * Time.deltaTime);
+            }
         }
     }
 }

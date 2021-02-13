@@ -135,8 +135,6 @@ public partial class BoardManager : MonoBehaviour
             currentPlayerNode.gridY + Mathf.RoundToInt(GetInputVector().z)
             ];
 
-        //Node checkNodeAtDesiredLocation = worldGrid.NodeFromWorldPoint(desiredPlayerLocation);
-
         if (desiredNodeLocation.walkable)
         {
             ChangeState(States.CalculatingMovements);
