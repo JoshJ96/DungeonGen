@@ -38,7 +38,7 @@ public class Unit : MonoBehaviour
     }
     #endregion
 
-    public int walkSpeed;
+    public int walkSpeed = 7;
 
     //Desired Node (used in Board Manager)
     private Node desiredNode;

@@ -55,28 +55,6 @@ public class Grid_GFX : MonoBehaviour
         {
             GL.Begin(GL.LINES);
             GL.Color(new Color(0, 0, 0, 0.1f));
-            foreach (EnemyUnit enemyUnit in enemiesInRoom)
-            {
-                if (enemyUnit.GetCurrentNode().worldPosition == node.worldPosition)
-                {
-                    GL.Begin(GL.QUADS);
-                    GL.Color(new Color(2, 0, 0, 0.4f));
-                    GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z + 0.5f);
-                    GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z - 0.5f);
-                    GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);
-                    GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z + 0.5f);
-                    continue;
-                }
-                else if (PlayerUnit.instance.GetCurrentNode().worldPosition == node.worldPosition)
-                {
-                    GL.Color(new Color(0, 0, 2, 0.4f));
-                    GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z + 0.5f);
-                    GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z - 0.5f);
-                    GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);
-                    GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z + 0.5f);
-                    continue;
-                }
-            }
             GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z + 0.5f);
             GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);
             GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);

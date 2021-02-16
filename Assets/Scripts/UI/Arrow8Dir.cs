@@ -32,6 +32,10 @@ public class Arrow8Dir : MonoBehaviour
 
     void LateUpdate()
     {
+        if (FindObjectOfType<PlayerUnit>() == null)
+        {
+            return;
+        }
         switch (PlayerUnit.instance.facingDirection)
         {
             case Unit.Direction.North:
