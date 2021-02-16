@@ -27,13 +27,13 @@ public class PlayerUnit : Unit
     {
         if (moving)
         {
-            blendValue = 1.0f;
+            blendValue += 4 * Time.deltaTime;
         }
         else
         {
-            blendValue -= 2 * Time.deltaTime;
-            blendValue = Mathf.Clamp(blendValue, 0, 1);
+            blendValue -= 4 * Time.deltaTime;
         }
+        blendValue = Mathf.Clamp(blendValue, 0, 1);
         animator.SetFloat("Blend", blendValue);
     }
 

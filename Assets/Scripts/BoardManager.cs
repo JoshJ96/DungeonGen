@@ -72,7 +72,7 @@ public partial class BoardManager : MonoBehaviour
         {
             if (item.CompareTag("Overhead Location"))
             {
-                GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(90,0,0)));
+                GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(transform.rotation.x,0,0)));
 
                 damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
                 return;

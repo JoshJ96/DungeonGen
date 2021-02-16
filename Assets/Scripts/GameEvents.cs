@@ -47,4 +47,8 @@ public class GameEvents : MonoBehaviour
     public event Action<Item> useItem;
     public void UseItem(Item toAdd) => useItem?.Invoke(toAdd);
 
+    //Enemy destruction event
+    public event Action<EnemyUnit> enemyDestruction;
+    public void EnemyDestruction(EnemyUnit unit) => enemyDestruction?.Invoke(unit);
+
 }

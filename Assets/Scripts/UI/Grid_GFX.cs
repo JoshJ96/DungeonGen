@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,13 +6,20 @@ using UnityEngine;
 
 public class Grid_GFX : MonoBehaviour
 {
-    List<EnemyUnit> hi = new List<EnemyUnit>();
+    List<EnemyUnit> enemiesInRoom = new List<EnemyUnit>();
 
     static Material lineMaterial;
     private void Start()
     {
-        hi = FindObjectsOfType<EnemyUnit>().ToList();
+        enemiesInRoom = FindObjectsOfType<EnemyUnit>().ToList();
+        GameEvents.instance.enemyDestruction += EnemyDestruction;
     }
+
+    private void EnemyDestruction(EnemyUnit obj)
+    {
+        enemiesInRoom.Remove(obj);
+    }
+
     static void CreateLineMaterial()
     {
         if (!lineMaterial)
@@ -47,7 +55,7 @@ public class Grid_GFX : MonoBehaviour
         {
             GL.Begin(GL.LINES);
             GL.Color(new Color(0, 0, 0, 0.1f));
-            foreach (EnemyUnit enemyUnit in hi)
+            foreach (EnemyUnit enemyUnit in enemiesInRoom)
             {
                 if (enemyUnit.GetCurrentNode().worldPosition == node.worldPosition)
                 {

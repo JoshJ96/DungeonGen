@@ -45,7 +45,8 @@ public class EnemyUnit : Unit
     {
         if (currentHitpoints <= 0)
         {
-            Destroy(this.gameObject);
+            GameEvents.instance.EnemyDestruction(this);
+            Destroy(gameObject);
         }
     }
 
