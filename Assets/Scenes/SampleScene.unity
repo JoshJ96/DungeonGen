@@ -153,11 +153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14c371af4fdd4064ead85e3acee9f14c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapWidth: 100
-  mapHeight: 100
-  roomMinSize: 5
-  roomMaxSize: 10
-  bspDeviation: 0.05
+  mapWidth: 170
+  mapHeight: 170
+  roomMinSize: 7
+  roomMaxSize: 20
+  bspDeviation: 0.062
 --- !u!4 &31101033
 Transform:
   m_ObjectHideFlags: 0
@@ -659,7 +659,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &287556235
 MeshCollider:
   m_ObjectHideFlags: 0
