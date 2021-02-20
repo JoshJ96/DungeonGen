@@ -219,6 +219,12 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    public int layer;
+    private void LateUpdate()
+    {
+        print(dividerList.Where(x => x.depth == layer).ToList().Count());
+    }
+
     private bool DividerCanBeCarvedX(Divider divider)
     {
         return !((divider.x2 - divider.x1) < (roomMaxSize * 2.5));
@@ -244,7 +250,7 @@ public class DungeonGenerator : MonoBehaviour
         }
 
 
-        foreach (var item in dividerList)
+        foreach (var item in dividerList.Where(x => x.depth == layer).ToList())
         {
             {
                 Gizmos.color = Color.red;
