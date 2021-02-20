@@ -1,206 +1,221 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
+//Divider class definition
+public class Divider
+{
+    public int depth;
+    public Divider leftChild, rightChild;
+    public int x1, x2, y1, y2;
+}
 
 public class DungeonGenerator : MonoBehaviour
 {
-    List<Room> roomsList = new List<Room>();
-    Tile[,] map;
-    public GameObject
-        wallObject,
-        playerObject;
-    public int roomMaxSize, roomMinSize;
-    public int mapWidth, mapHeight;
-    public int maxRooms;
-    public int playerStartX, playerStartY;
-    int justincase = 43300;
-
-    void Start()
+    enum Axis
     {
-        GenerateDungeon(mapWidth, mapHeight);
+        X,
+        Y
     }
 
-    private void GenerateDungeon(int roomMaxSize, int roomMinSize)
-    {
-        InitializeMap();
-        PlaceRooms();
-        CarveTunnels();
-        PrintMap();
-    }
-    void InitializeMap()
-    {
-        map = new Tile[mapWidth - 1, mapHeight - 1];
+    //Map size properties
+    [Range(20, 500)]
+    public int mapWidth;
+    [Range(20, 500)]
+    public int mapHeight;
 
-        for (int x = 0; x < mapWidth - 1; x++)
+    //Room size properties
+    [Range(5, 30)]
+    public int roomMinSize;
+    [Range(5, 30)]
+    public int roomMaxSize;
+
+    //BSP Divider Root
+    Divider root;
+    List<Divider> dividerList = new List<Divider>();
+
+    //The % of random coords from middle to be chosen (0.05 = 5%)
+    [Range(0, 1)]
+    public float bspDeviation = 0.05f;
+
+    private void Start()
+    {
+        GenerateDungeon();
+    }
+
+    private void GenerateDungeon()
+    {
+        Initialize_BSP_Root();
+        BSP_Split(0);
+    }
+
+    private void Initialize_BSP_Root()
+    {
+        //Create the initial root divider
+        root = new Divider
         {
-            for (int y = 0; y < mapHeight - 1; y++)
-            {
-                map[x, y] = new Tile { };
-                map[x, y].tileType = Tile.State.Wall;
-            }
+            depth = 0,
+            x1 = 0,
+            y1 = 0,
+            x2 = mapWidth,
+            y2 = mapHeight
+        };
+
+        dividerList.Add(root);
+    }
+
+    int deleteThis = 400;
+
+    private void BSP_Split(int currentDepth)
+    {
+        deleteThis--;
+        if (deleteThis <= 0)
+        {
+            return;
         }
-    }
-    void PlaceRooms()
-    {
-        int numRooms = 0;
 
-        while (numRooms != maxRooms)
+        //Loop through every divider at the current depth
+        List<Divider> toCarve = dividerList.Where(x => x.depth == currentDepth).ToList();
+
+        if (toCarve.Count != 0)
         {
-            justincase--;
-            if (justincase == 0)
+            foreach (var item in dividerList.Where(x => x.depth == currentDepth).ToList())
             {
-                return;
-            }
-            //Random width and height
-            int w = UnityEngine.Random.Range(roomMinSize, roomMaxSize);
-            int h = UnityEngine.Random.Range(roomMinSize, roomMaxSize);
-            //Random Position
-            int x = UnityEngine.Random.Range(0, mapWidth - w - 1);
-            int y = UnityEngine.Random.Range(0, mapHeight - h - 1);
-            //Create the room
-            Room newRoom = new Room(x, y, w, h);
-            //Check for overlap
-            bool failed = false;
-            foreach (var room in roomsList)
-            {
-                if (RoomsOverlap(newRoom, room))
-                {
-                    failed = true;
-                    //break;
-                }
-            }
-            //If no overlap, create the room
-            if (!failed)
-            {
-                CreateRoom(newRoom);
+                //Pick a random axis
+                int rng = UnityEngine.Random.Range(0, 2);
 
-                //Reserve player spawn if last room created
-                if (numRooms == 0)
+                //X
+                if (rng == 0)
                 {
-                    playerStartX = (int)newRoom.center.x;
-                    playerStartY = (int)newRoom.center.y;
-                }
-                else
-                {
-                    //Center coordinates of previous room
-                    Vector2 previousCoordinates = roomsList[numRooms - 1].center;
-
-                    //Random chance for horizontal/vertical passage
-                    int coinToss = UnityEngine.Random.Range(0, 2);
-
-                    //if (coinToss == 0)
+                    //If it can't be carved along the X axis, switch and try Y axis
+                    if (DividerCanBeCarvedX(item))
                     {
-                        CarveHorizontalTunnel((int)previousCoordinates.x, (int) newRoom.center.x, (int) previousCoordinates.y);
-                        CarveVerticalTunnel((int)previousCoordinates.y, (int) newRoom.center.y, (int)newRoom.center.x);
+                        CarveDivider(item, Axis.X);
                     }
-                    //else if (coinToss == 1)
-                    //{
-                    //    CarveVerticalTunnel((int)previousCoordinates.y, (int)newRoom.center.y, (int)previousCoordinates.x);
-                    //    CarveHorizontalTunnel((int)previousCoordinates.x, (int)newRoom.center.x, (int)newRoom.center.y);
-                    //}
+                    else if (DividerCanBeCarvedY(item))
+                    {
+                        CarveDivider(item, Axis.Y);
+                    }
                 }
-                numRooms++;
-                roomsList.Add(newRoom);
-            }
-        }
-    }
 
-    void CarveTunnels()
-    {
-
-    }
-
-
-    void PrintMap()
-    {
-        GameObject player = Instantiate(playerObject, new Vector3(transform.position.x + playerStartX + 0.5f, -.5f, transform.position.z + playerStartY + 0.5f), Quaternion.identity);
-        player.GetComponent<PlayerUnit>().walkSpeed = 7;
-
-        for (int x = 0; x < mapWidth - 1; x++)
-        {
-            for (int y = 0; y < mapHeight - 1; y++)
-            {
-                if (map[x,y].tileType == Tile.State.Wall)
+                //Y
+                if (rng == 1)
                 {
-                    GameObject wall = Instantiate(wallObject, new Vector3(transform.position.x + x + 0.5f,0, transform.position.z + y + 0.5f), Quaternion.identity);
-                    wall.transform.parent = this.transform;
+                    //If it can't be carved along the Y axis, switch and try X axis
+                    if (DividerCanBeCarvedY(item))
+                    {
+                        CarveDivider(item, Axis.Y);
+                    }
+                    else if (DividerCanBeCarvedX(item))
+                    {
+                        CarveDivider(item, Axis.X);
+                    }
                 }
             }
         }
+        else
+        {
+            return;
+        }
+        print(currentDepth);
+        BSP_Split(currentDepth + 1);
     }
 
-    /*
-    ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
-    ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝
-    ███████║█████╗░░██║░░░░░██████╔╝█████╗░░██████╔╝╚█████╗░
-    ██╔══██║██╔══╝░░██║░░░░░██╔═══╝░██╔══╝░░██╔══██╗░╚═══██╗
-    ██║░░██║███████╗███████╗██║░░░░░███████╗██║░░██║██████╔╝
-    ╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═════╝░
-    */
 
-    void CreateRoom(Room room)
+    private void CarveDivider(Divider divider, Axis axis)
     {
-        for (int x = room.mapX + 1; x < room.mapX + room.width; x++)
+        if (axis == Axis.X)
         {
-            for (int y = room.mapY + 1; y < room.mapY + room.height; y++)
+            //Deviate a random point from carve center
+            int lowerBounds = (int)((divider.x2 + divider.x1) * (0.5f - bspDeviation));
+            int upperBounds = (int)((divider.x2 + divider.x1) * (0.5f + bspDeviation));
+            int carveCoordinate = UnityEngine.Random.Range(lowerBounds, upperBounds);
+
+            //Create left and right child dividers
+            Divider left = new Divider
             {
-                map[x, y].tileType = Tile.State.Floor;
-                map[x, y].blockSight = false;
-            }
+                x1 = divider.x1,
+                x2 = carveCoordinate,
+                y1 = divider.y1,
+                y2 = divider.y2,
+                depth = divider.depth + 1
+            };
+            Divider right = new Divider
+            {
+                x1 = carveCoordinate,
+                x2 = divider.x2,
+                y1 = divider.y1,
+                y2 = divider.y2,
+                depth = divider.depth + 1
+            };
+
+            dividerList.Add(right);
+            dividerList.Add(left);
+            divider.leftChild = left;
+            divider.rightChild = right;
+        }
+        else if (axis == Axis.Y)
+        {
+            //Deviate a random point from carve center
+            int lowerBounds = (int)((divider.y2 + divider.y1) * (0.5f - bspDeviation));
+            int upperBounds = (int)((divider.y2 + divider.y1) * (0.5f + bspDeviation));
+            int carveCoordinate = UnityEngine.Random.Range(lowerBounds, upperBounds);
+
+            //Create left and right child dividers
+            Divider left = new Divider
+            {
+                y1 = divider.y1,
+                y2 = carveCoordinate,
+                x1 = divider.x1,
+                x2 = divider.x2,
+                depth = divider.depth + 1
+            };
+            Divider right = new Divider
+            {
+                y1 = carveCoordinate,
+                y2 = divider.y2,
+                x1 = divider.x1,
+                x2 = divider.x2,
+                depth = divider.depth + 1
+            };
+
+            dividerList.Add(right);
+            dividerList.Add(left);
+            divider.leftChild = left;
+            divider.rightChild = right;
         }
     }
 
-    void CarveHorizontalTunnel(int x1, int x2, int y)
+    private bool DividerCanBeCarvedX(Divider divider)
     {
-        if (x1 < x2)
-        {
-            for (int x = x1; x < x2 + 1; x++)
-            {
-                map[x, y].tileType = Tile.State.Floor;
-                map[x, y].blockSight = false;
-            }
-        }
-        else if (x1 > x2)
-        {
-            for (int x = x1 + 1; x > x2; x--)
-            {
-                map[x, y].tileType = Tile.State.Floor;
-                map[x, y].blockSight = false;
-            }
-        }
+        return !((divider.x2 - divider.x1) < (roomMaxSize * 2));
     }
 
-    void CarveVerticalTunnel(int y1, int y2, int x)
+    private bool DividerCanBeCarvedY(Divider divider)
     {
-        if (y1 < y2)
-        {
-            for (int y = y1; y < y2 + 1; y++)
-            {
-                map[x, y].tileType = Tile.State.Floor;
-                map[x, y].blockSight = false;
-            }
-        }
-        else if (y1 > y2)
-        {
-            for (int y = y1 + 1; y > y2; y--)
-            {
-                map[x, y].tileType = Tile.State.Floor;
-                map[x, y].blockSight = false;
-            }
-        }
+        return !((divider.y2 - divider.y1) < (roomMaxSize * 2));
     }
 
-    bool RoomsOverlap(Room room1, Room room2)
+    private void OnDrawGizmos()
     {
-        return (
-            room1.mapX                <= room2.mapX + room2.width
-            &&
-            room1.mapX + room1.width  >= room2.mapX
-            &&
-            room1.mapY                <= room2.mapY + room2.height
-            &&
-            room1.mapY + room1.height >= room2.mapY
-            );
+
+        foreach (var item in dividerList)
+        {
+            for (int x = item.x1; x < item.x2 - 1; x++)
+            {
+                for (int y = item.y1; y < item.y2 - 1; y++)
+                {
+                    if (x == item.x1 || x == item.x2 - 2 || y == item.y1 || y == item.y2 - 2)
+                    {
+                        Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
+                    }
+                }
+            }
+        }
     }
 }
+
+
+

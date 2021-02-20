@@ -153,17 +153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14c371af4fdd4064ead85e3acee9f14c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallObject: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd,
-    type: 3}
-  playerObject: {fileID: 8472271646588490433, guid: 5f71644e8074f05489160a004f3423a2,
-    type: 3}
-  roomMaxSize: 36
-  roomMinSize: 5
   mapWidth: 100
   mapHeight: 100
-  maxRooms: 15
-  playerStartX: 0
-  playerStartY: 0
+  roomMinSize: 5
+  roomMaxSize: 10
+  bspDeviation: 0.05
 --- !u!4 &31101033
 Transform:
   m_ObjectHideFlags: 0
@@ -1276,7 +1270,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 412.5, y: 118.3}
+  m_AnchoredPosition: {x: 412.5, y: 118.299805}
   m_SizeDelta: {x: 824.8397, y: 236.50415}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &909624390
