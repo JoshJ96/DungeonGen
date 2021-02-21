@@ -153,11 +153,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14c371af4fdd4064ead85e3acee9f14c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapWidth: 170
-  mapHeight: 170
-  roomMinSize: 7
+  mapWidth: 250
+  mapHeight: 250
+  roomMinSize: 18
   roomMaxSize: 20
-  bspDeviation: 0.062
+  bspDeviation: 0.05
+  numberDivides: 6
+  layer: 5
 --- !u!4 &31101033
 Transform:
   m_ObjectHideFlags: 0
