@@ -64,12 +64,18 @@ public class DungeonGenerator : MonoBehaviour
     [Range(5, 100)]
     public int roomMaxSize;
 
+    public int[,] map;
+
     //BSP Divider Root
     Divider root;
     List<Divider> dividerList = new List<Divider>();
     List<Room> roomList = new List<Room>();
     List<Hallway> hallwayList = new List<Hallway>();
     int finalIteration = 0;
+
+    //Map objects
+    public GameObject floor;
+    public GameObject wall;
 
     //The % of random coords from middle to be chosen (0.05 = 5%)
     [Range(0, 0.1f)]
@@ -86,6 +92,61 @@ public class DungeonGenerator : MonoBehaviour
         Recursive_BSP_Split(0);
         Random_Place_Rooms();
         Generate_Hallways();
+        Instantiate_Terrain();
+    }
+
+    private void Instantiate_Terrain()
+    {
+        map = new int[mapWidth, mapHeight];
+
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                map[x, y] = 1;
+            }
+        }
+
+        //Rooms
+        foreach (var room in roomList)
+        {
+            for (int x = room.x1; x < room.x2; x++)
+            {
+                for (int y = room.y1; y < room.y2; y++)
+                {
+                    map[x,y] = 0;
+                }
+            }
+        }
+
+        //Cooridors
+        foreach (var item in hallwayList)
+        {
+            for (int x = item.x1; x < item.x2; x++)
+            {
+                for (int y = item.y1; y < item.y2; y++)
+                {
+                    map[x,y] = 0;
+                }
+            }
+        }
+
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (map[x, y] == 1)
+                {
+                    GameObject wallObj = Instantiate(wall, new Vector3(x, 1, y), Quaternion.identity);
+                    wallObj.transform.parent = this.transform;
+                }
+                else if (map[x, y] == 0)
+                {
+                    GameObject floorObj = Instantiate(floor, new Vector3(x, 0, y), Quaternion.identity);
+                    floorObj.transform.parent = this.transform;
+                }
+            }
+        }
     }
 
     private void Random_Place_Rooms()
@@ -127,7 +188,7 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         int count = 2;
-        while (count < finalIteration)
+        while (count < finalIteration + 1)
         {
             //Get dividers at finalIteration - 2 (to access child nodes)
             foreach (var divider in dividerList.Where(x => x.depth == finalIteration - count))
@@ -417,80 +478,5 @@ public class DungeonGenerator : MonoBehaviour
     private bool DividerCanBeCarvedY(Divider divider)
     {
         return !((divider.y2 - divider.y1) < (roomMaxSize * 2));
-    }
-
-    private void OnDrawGizmos()
-    {
-
-        foreach (var item in hallwayList)
-        {
-            if (item.x1 < item.x2)
-            {
-                for (int x = item.x1; x < item.x2; x++)
-                {
-                    for (int y = item.y1; y < item.y2; y++)
-                    {
-                        Gizmos.color = Color.blue;
-                        Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                    }
-                }
-            }
-            if (item.x1 > item.x2)
-            {
-                for (int x = item.x2; x > item.x2; x--)
-                {
-                    for (int y = item.y2; x > item.y2; y--)
-                    {
-                        Gizmos.color = Color.grey;
-                        Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                    }
-                }
-            }
-
-        }
-
-        foreach (var divider in dividerList.Where(x => x.depth == finalIteration-1))
-        {
-            if (divider.leftChild != null && divider.rightChild != null)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawCube(new Vector3(divider.leftChild.x1 + 3, 0, divider.leftChild.y1 + 3), Vector3.one);
-                Gizmos.DrawCube(new Vector3(divider.rightChild.x1 + 3, 0, divider.rightChild.y1 + 3), Vector3.one);
-            }
-        }
-
-
-        foreach (var room in roomList)
-        {
-            for (int x = room.x1; x < room.x2; x++)
-            {
-                for (int y = room.y1; y < room.y2; y++)
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                }
-            }
-        }
-
-
-        foreach (var item in dividerList.Where(x => x.depth == layer).ToList())
-        {
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawCube(new Vector3((item.x2+item.x1)/2, 0, (item.y2+item.y1)/2), Vector3.one);
-
-                for (int x = item.x1; x < item.x2 - 1; x++)
-                {
-                    for (int y = item.y1; y < item.y2 - 1; y++)
-                    {
-                        if (x == item.x1 || x == item.x2 - 2 || y == item.y1 || y == item.y2 - 2)
-                        {
-                            Gizmos.color = Color.white;
-                            Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                        }
-                    }
-                }
-            }
-        }
     }
 }
