@@ -116,6 +116,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Generate_Hallways()
     {
+
         //Get dividers at finalIteration - 1 (to access child nodes)
         foreach (var divider in dividerList.Where(x => x.depth == finalIteration-1))
         {
@@ -125,33 +126,27 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-
-        //Get dividers at finalIteration - 2 (to access child nodes)
-        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 2))
+        int count = 2;
+        while (count < finalIteration)
         {
-            if (divider.leftChild != null && divider.rightChild != null)
+            //Get dividers at finalIteration - 2 (to access child nodes)
+            foreach (var divider in dividerList.Where(x => x.depth == finalIteration - count))
             {
-               var room2 = divider.leftChild.FindRoomsWithin(roomList);
-               var room1 = divider.rightChild.FindRoomsWithin(roomList);
-            if (room1 != null && room2 != null)
+                if (divider.leftChild != null && divider.rightChild != null)
                 {
-                    Create_Hallway(room1[0], room2[0]);
+                    var room2 = divider.leftChild.FindRoomsWithin(roomList);
+                    var room1 = divider.rightChild.FindRoomsWithin(roomList);
+
+                    if (room1 != null && room2 != null)
+                    {
+                        if (room1.Count != 0 && room2.Count != 0)
+                        {
+                            Create_Hallway(room1[0], room2[0]);
+                        }
+                    }
                 }
             }
-        }
-
-        //Get dividers at finalIteration - 2 (to access child nodes)
-        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 3))
-        {
-            if (divider.leftChild != null && divider.rightChild != null)
-            {
-                var room2 = divider.leftChild.FindRoomsWithin(roomList);
-                var room1 = divider.rightChild.FindRoomsWithin(roomList);
-                if (room1 != null && room2 != null)
-                {
-                    Create_Hallway(room1[0], room2[0]);
-                }
-            }
+            count++;
         }
     }
 
