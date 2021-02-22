@@ -11,6 +11,18 @@ public class Divider
     public Divider leftChild, rightChild;
     public int x1, x2, y1, y2;
     public Room roomWithin;
+    public List<Room> FindRoomsWithin(List<Room> roomList)
+    {
+        List<Room> toReturn = new List<Room>();
+        foreach (var room in roomList)
+        {
+            if (room.x1 >= this.x1 && room.x2 <= this.x2 && room.y1 >= this.y1 && room.y2 < this.y2)
+            {
+                toReturn.Add(room);
+            }
+        }
+        return toReturn;
+    }
 }
 
 public class Room
@@ -88,6 +100,7 @@ public class DungeonGenerator : MonoBehaviour
             int _y1 = UnityEngine.Random.Range(divider.y1, divider.y2 - height);
             int _x2 = _x1 + width;
             int _y2 = _y1 + height;
+
             Room room = new Room
             {
                 x1 = _x1,
@@ -111,15 +124,45 @@ public class DungeonGenerator : MonoBehaviour
                 Create_Hallway(divider.leftChild.roomWithin, divider.rightChild.roomWithin);
             }
         }
+
+
+        //Get dividers at finalIteration - 2 (to access child nodes)
+        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 2))
+        {
+            if (divider.leftChild != null && divider.rightChild != null)
+            {
+               var room2 = divider.leftChild.FindRoomsWithin(roomList);
+               var room1 = divider.rightChild.FindRoomsWithin(roomList);
+            if (room1 != null && room2 != null)
+                {
+                    Create_Hallway(room1[0], room2[0]);
+                }
+            }
+        }
+
+        //Get dividers at finalIteration - 2 (to access child nodes)
+        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 3))
+        {
+            if (divider.leftChild != null && divider.rightChild != null)
+            {
+                var room2 = divider.leftChild.FindRoomsWithin(roomList);
+                var room1 = divider.rightChild.FindRoomsWithin(roomList);
+                if (room1 != null && room2 != null)
+                {
+                    Create_Hallway(room1[0], room2[0]);
+                }
+            }
+        }
     }
 
     private void Create_Hallway(Room roomWithin1, Room roomWithin2)
     {
+
         Vector2 center1 = roomWithin1.GetCenter();
         Vector2 center2 = roomWithin2.GetCenter();
 
         //Random corridor direction
-        int rng = 0;// UnityEngine.Random.Range(0, 2);
+        int rng = UnityEngine.Random.Range(0, 2);
 
         //X then Y
         if (rng == 0)
@@ -130,7 +173,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayX = new Hallway
                 {
                     x1 = (int)center1.x,
-                    x2 = (int)center2.x,
+                    x2 = (int)center2.x+1,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 1
                 };
@@ -142,7 +185,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayX = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center1.x,
+                    x2 = (int)center1.x-1,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 1
                 };
@@ -171,6 +214,57 @@ public class DungeonGenerator : MonoBehaviour
                     y2 = (int)center1.y
                 };
                 hallwayList.Add(hallwayY);
+            }
+        }
+        else if (rng == 1)
+        {
+            //Y Down to Up
+            if (center2.y > center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 1,
+                    y1 = (int)center1.y,
+                    y2 = (int)center2.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+            else if (center2.y < center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 1,
+                    y1 = (int)center2.y,
+                    y2 = (int)center1.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+
+            //X Left to Right
+            if (center2.x > center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center1.x,
+                    x2 = (int)center2.x + 1,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 1
+                };
+                hallwayList.Add(hallwayX);
+            }
+            //X Right to Left
+            else if (center2.x < center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center1.x - 1,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 1
+                };
+                hallwayList.Add(hallwayX);
             }
         }
     }
@@ -232,7 +326,7 @@ public class DungeonGenerator : MonoBehaviour
                     //If it can't be carved along the Y axis, switch and try X axis
                     if (DividerCanBeCarvedY(item))
                     {
-                      CarveDivider(item, Axis.Y);
+                        CarveDivider(item, Axis.Y);
                     }
                     else if (DividerCanBeCarvedX(item))
                     {
@@ -322,12 +416,12 @@ public class DungeonGenerator : MonoBehaviour
 
     private bool DividerCanBeCarvedX(Divider divider)
     {
-        return !((divider.x2 - divider.x1) < (roomMaxSize * 2.5));
+        return !((divider.x2 - divider.x1) < (roomMaxSize * 2));
     }
 
     private bool DividerCanBeCarvedY(Divider divider)
     {
-        return !((divider.y2 - divider.y1) < (roomMaxSize * 2.5));
+        return !((divider.y2 - divider.y1) < (roomMaxSize * 2));
     }
 
     private void OnDrawGizmos()
@@ -352,7 +446,7 @@ public class DungeonGenerator : MonoBehaviour
                 {
                     for (int y = item.y2; x > item.y2; y--)
                     {
-                        Gizmos.color = Color.blue;
+                        Gizmos.color = Color.grey;
                         Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
                     }
                 }
