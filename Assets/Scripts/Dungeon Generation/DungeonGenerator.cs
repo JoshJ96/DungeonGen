@@ -64,7 +64,7 @@ public class DungeonGenerator : MonoBehaviour
     [Range(5, 100)]
     public int roomMaxSize;
 
-    public int[,] map;
+    public Node[,] map;
 
     //BSP Divider Root
     Divider root;
@@ -81,7 +81,9 @@ public class DungeonGenerator : MonoBehaviour
     [Range(0, 0.1f)]
     public float bspDeviation = 0.05f;
 
-    private void Start()
+    public GameObject grid;
+
+    private void Awake()
     {
         GenerateDungeon();
     }
@@ -97,24 +99,39 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Instantiate_Terrain()
     {
-        map = new int[mapWidth, mapHeight];
+        map = new Node[mapWidth, mapHeight];
 
         for (int x = 0; x < mapWidth; x++)
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                map[x, y] = 1;
+                map[x, y] = new Node
+                {
+                    walkable = false,
+                    worldPosition = new Vector3(x, 0, y),
+                    gridX = x,
+                    gridY = y
+                };
             }
         }
 
         //Rooms
         foreach (var room in roomList)
         {
-            for (int x = room.x1; x < room.x2; x++)
+            for (int x = room.x1; x < room.x2-1; x++)
             {
-                for (int y = room.y1; y < room.y2; y++)
+                for (int y = room.y1; y < room.y2-1; y++)
                 {
-                    map[x,y] = 0;
+                    try
+                    {
+                        map[x, y].walkable = true;
+
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
                 }
             }
         }
@@ -126,7 +143,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 for (int y = item.y1; y < item.y2; y++)
                 {
-                    map[x,y] = 0;
+                    map[x, y].walkable = true;
                 }
             }
         }
@@ -135,18 +152,25 @@ public class DungeonGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                if (map[x, y] == 1)
+                if (!map[x, y].walkable)
                 {
                     GameObject wallObj = Instantiate(wall, new Vector3(x, 1, y), Quaternion.identity);
                     wallObj.transform.parent = this.transform;
                 }
-                else if (map[x, y] == 0)
+                else if (map[x, y].walkable)
                 {
                     GameObject floorObj = Instantiate(floor, new Vector3(x, 0, y), Quaternion.identity);
                     floorObj.transform.parent = this.transform;
                 }
             }
         }
+
+        grid.SetActive(true);
+        grid.GetComponent<Grid>().gridSizeX = mapWidth;
+        grid.GetComponent<Grid>().gridSizeY = mapHeight;
+        grid.GetComponent<Grid>().grid = map;
+
+
     }
 
     private void Random_Place_Rooms()
@@ -231,7 +255,7 @@ public class DungeonGenerator : MonoBehaviour
                     x1 = (int)center1.x,
                     x2 = (int)center2.x+1,
                     y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
+                    y2 = (int)center1.y + 2
                 };
                 hallwayList.Add(hallwayX);
             }
@@ -243,7 +267,7 @@ public class DungeonGenerator : MonoBehaviour
                     x1 = (int)center2.x,
                     x2 = (int)center1.x-1,
                     y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
+                    y2 = (int)center1.y + 2
                 };
                 hallwayList.Add(hallwayX);
             }
@@ -254,7 +278,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayY = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
+                    x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center2.y
                 };
@@ -265,7 +289,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayY = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
+                    x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
                     y2 = (int)center1.y
                 };
@@ -280,7 +304,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayY = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
+                    x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center2.y
                 };
@@ -291,7 +315,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayY = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
+                    x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
                     y2 = (int)center1.y
                 };
@@ -306,7 +330,7 @@ public class DungeonGenerator : MonoBehaviour
                     x1 = (int)center1.x,
                     x2 = (int)center2.x + 1,
                     y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
+                    y2 = (int)center1.y + 2
                 };
                 hallwayList.Add(hallwayX);
             }
@@ -316,7 +340,7 @@ public class DungeonGenerator : MonoBehaviour
                 Hallway hallwayX = new Hallway
                 {
                     x1 = (int)center2.x,
-                    x2 = (int)center1.x - 1,
+                    x2 = (int)center1.x - 2,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 1
                 };

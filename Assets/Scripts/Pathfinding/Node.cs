@@ -13,13 +13,13 @@ public class Node
 	public int hCost;
 	public Node parent;
 
-	public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY)
-	{
-		walkable = _walkable;
-		worldPosition = _worldPos;
-		gridX = _gridX;
-		gridY = _gridY;
-	}
+	//public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY)
+	//{
+	//	walkable = _walkable;
+	//	worldPosition = _worldPos;
+	//	gridX = _gridX;
+	//	gridY = _gridY;
+	//}
 
 	public int fCost
 	{

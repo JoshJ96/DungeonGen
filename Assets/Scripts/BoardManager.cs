@@ -51,7 +51,7 @@ public partial class BoardManager : MonoBehaviour
 
     #endregion
 
-    Grid worldGrid;
+    public Grid worldGrid;
     Pathfinding pathfinding;
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
     bool canInput = true;
@@ -60,7 +60,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void Start()
     {
-        worldGrid = GetComponent<Grid>();
+        //worldGrid = GetComponent<Grid>();
         pathfinding = GetComponent<Pathfinding>();
         GameEvents.instance.turnPass += TurnPass;
         GameEvents.instance.doDamage += DoDamage;
