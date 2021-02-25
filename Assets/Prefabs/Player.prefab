@@ -1219,7 +1219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   facingDirection: 0
-  walkSpeed: 2
+  walkSpeed: 7
   attackRange: 0
   aggroRange: 0
   moving: 0

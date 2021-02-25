@@ -6,7 +6,7 @@ Preset:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 16Room_60x60_DungeonGenerator
+  m_Name: 16x16_Basic
   m_TargetType:
     m_NativeTypeID: 114
     m_ManagedTypePPtr: {fileID: 11500000, guid: 14c371af4fdd4064ead85e3acee9f14c,
@@ -27,40 +27,58 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: mapWidth
-    value: 70
+    value: 200
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: mapHeight
-    value: 70
+    value: 209
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: roomMinSize
-    value: 6
+    value: 7
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: roomMaxSize
-    value: 13
+    value: 19
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: roomOverlapPreventionFactor
+    value: 2.37
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: numberDivides
     value: 5
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: floor
+    propertyPath: wallObj
+    value: 
+    objectReference: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: floorObj
     value: 
     objectReference: {fileID: 1001726653373610900, guid: a1c19f4aff57dcc4c8cb18d5e6666d0d,
       type: 3}
   - target: {fileID: 0}
-    propertyPath: wall
+    propertyPath: playerObj
     value: 
-    objectReference: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd,
+    objectReference: {fileID: 8472271646588490433, guid: 5f71644e8074f05489160a004f3423a2,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: camObj
+    value: 
+    objectReference: {fileID: 959378775145398938, guid: f477b92ecf8b52a47b465f88796872d2,
       type: 3}
   - target: {fileID: 0}
     propertyPath: bspDeviation
     value: 0.05
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: grid
-    value: 
+    propertyPath: testMode
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: drawWalls
+    value: 0
     objectReference: {fileID: 0}
   m_ExcludedProperties: []

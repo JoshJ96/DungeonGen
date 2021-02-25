@@ -4,46 +4,90 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
-	//Singleton
+	#region Singleton
 	public static Grid instance;
-	public LayerMask unwalkableMask;
-	public Vector2 gridWorldSize;
-	public float nodeRadius;
+	void Awake() => instance = this;
+	#endregion
+
 	public Node[,] grid;
-
-	float nodeDiameter;
 	public int gridSizeX, gridSizeY;
-
 	public bool gizmo = false;
+	public List<Node> path;
+	public Transform seeker, target;
 
-	void Awake()
+
+	public void FindPath(Node start, Node target)
 	{
-		instance = this;
-		//nodeDiameter = nodeRadius * 2;
-		//gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-		//gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
-		//CreateGrid();
+		List<Node> openSet = new List<Node>();
+		HashSet<Node> closedSet = new HashSet<Node>();
+		openSet.Add(start);
+
+		while (openSet.Count > 0)
+		{
+			Node node = openSet[0];
+			for (int i = 1; i < openSet.Count; i++)
+			{
+				if (openSet[i].fCost < node.fCost || openSet[i].fCost == node.fCost)
+				{
+					if (openSet[i].hCost < node.hCost)
+						node = openSet[i];
+				}
+			}
+
+			openSet.Remove(node);
+			closedSet.Add(node);
+
+			if (node == target)
+			{
+				RetracePath(start, target);
+				return;
+			}
+
+			foreach (Node neighbour in GetNeighbours(node))
+			{
+				if (!neighbour.walkable || closedSet.Contains(neighbour))
+				{
+					continue;
+				}
+
+				int newCostToNeighbour = node.gCost + GetDistance(node, neighbour);
+				if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+				{
+					neighbour.gCost = newCostToNeighbour;
+					neighbour.hCost = GetDistance(neighbour, target);
+					neighbour.parent = node;
+
+					if (!openSet.Contains(neighbour))
+						openSet.Add(neighbour);
+				}
+			}
+		}
 	}
 
-    //private void LateUpdate()
-    //{
-	//	CreateGrid();
-	//}
+	void RetracePath(Node startNode, Node endNode)
+	{
+		List<Node> retracedPath = new List<Node>();
+		Node currentNode = endNode;
 
-	//public void CreateGrid()
-	//{
-	//	Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
-	//
-	//	for (int x = 0; x < gridSizeX; x++)
-	//	{
-	//		for (int y = 0; y < gridSizeY; y++)
-	//		{
-	//			Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * //nodeDiameter + nodeRadius);
-	//			bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-	//			grid[x, y] = new Node(walkable, worldPoint, x, y);
-	//		}
-	//	}
-	//}
+		while (currentNode != startNode)
+		{
+			retracedPath.Add(currentNode);
+			currentNode = currentNode.parent;
+		}
+		retracedPath.Reverse();
+
+		path = retracedPath;
+	}
+
+	int GetDistance(Node nodeA, Node nodeB)
+	{
+		int dstX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
+		int dstY = Mathf.Abs(nodeA.gridY - nodeB.gridY);
+
+		if (dstX > dstY)
+			return 14 * dstY + 10 * (dstX - dstY);
+		return 14 * dstX + 10 * (dstY - dstX);
+	}
 
 	public List<Node> GetNeighbours(Node node)
 	{
@@ -73,8 +117,6 @@ public class Grid : MonoBehaviour
 	{
 		return grid[(int)worldPosition.x, (int)worldPosition.z];
 	}
-
-	public List<Node> path;
 
 	void OnDrawGizmos()
 	{

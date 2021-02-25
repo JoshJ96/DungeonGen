@@ -29,10 +29,16 @@ public class Room
 {
     public Divider dividerParent;
     public int x1, x2, y1, y2;
-    public Vector2 GetCenter()
+    public Vector2 GetV2Center()
     {
         return new Vector2((x2 + x1) / 2, (y2 + y1) / 2);
     }
+
+    public Vector3 GetV3Center()
+    {
+        return new Vector3((x2 + x1) / 2, 0, (y2 + y1) / 2);
+    }
+
 }
 
 public class Hallway
@@ -46,6 +52,11 @@ public class Hallway
 
 public class DungeonGenerator : MonoBehaviour
 {
+    #region Singleton
+    public static DungeonGenerator instance;
+    private void Awake() => instance = this;
+    #endregion
+
     enum Axis
     {
         X,
@@ -66,22 +77,36 @@ public class DungeonGenerator : MonoBehaviour
 
     //BSP Divider Root
     Divider root;
-    List<Divider> dividerList = new List<Divider>();
-    List<Room> roomList = new List<Room>();
-    List<Hallway> hallwayList = new List<Hallway>();
+    public List<Divider> dividerList = new List<Divider>();
+    public List<Room> roomList = new List<Room>();
+    public List<Hallway> hallwayList = new List<Hallway>();
     int finalIteration = 0;
 
+    public Node[,] map;
+
+    [Range(0,3)]
+    public float roomOverlapPreventionFactor;
     public int numberDivides = 6;
     int divides;
+
+    public GameObject wallObj, floorObj, playerObj, camObj;
 
     //The % of random coords from middle to be chosen (0.05 = 5%)
     [Range(0, 0.1f)]
     public float bspDeviation = 0.05f;
 
+    public bool testMode = true;
+    public bool drawWalls = false;
+
     private void Update()
     {
         if (Input.GetKey(KeyCode.Space))
         {
+            if (!testMode)
+            {
+                return;
+            }
+
             dividerList.Clear();
             roomList.Clear();
             hallwayList.Clear();
@@ -89,6 +114,7 @@ public class DungeonGenerator : MonoBehaviour
             GenerateDungeon();
         }
     }
+
     private void Start()
     {
         GenerateDungeon();
@@ -96,184 +122,33 @@ public class DungeonGenerator : MonoBehaviour
 
     private void GenerateDungeon()
     {
+        Initialize_Node_Map();
         Initialize_BSP_Root();
         Recursive_BSP_Split(0);
         Random_Place_Rooms();
         Generate_Hallways();
+        Update_Node_Map();
+        Instantiate_Terrain_Objects();
+        Create_Player_And_Goal_Objects();
+        Pass_Map_To_Grid();
     }
 
-    private void Random_Place_Rooms()
+
+
+    private void Initialize_Node_Map()
     {
-        foreach (var divider in dividerList.Where(x => x.depth == finalIteration))
+        map = new Node[mapWidth, mapHeight];
+
+        for (int x = 0; x < mapWidth; x++)
         {
-            //Generate a random room
-            int width = UnityEngine.Random.Range(roomMinSize, roomMaxSize);
-            int height = UnityEngine.Random.Range(roomMinSize, roomMaxSize);
-
-            int _x1 = UnityEngine.Random.Range(divider.x1, divider.x2 - width);
-            int _y1 = UnityEngine.Random.Range(divider.y1, divider.y2 - height);
-            int _x2 = _x1 + width;
-            int _y2 = _y1 + height;
-
-            Room room = new Room
+            for (int y = 0; y < mapHeight; y++)
             {
-                x1 = _x1,
-                x2 = _x2,
-                y1 = _y1,
-                y2 = _y2
-            };
-
-            divider.roomWithin = room;
-            roomList.Add(room);
-        }
-    }
-
-    private void Generate_Hallways()
-    {
-
-        //Get dividers at finalIteration - 1 (to access child nodes)
-        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 1))
-        {
-            if (divider.leftChild != null && divider.rightChild != null)
-            {
-                Create_Hallway(divider.leftChild.roomWithin, divider.rightChild.roomWithin);
-            }
-        }
-
-        int count = 2;
-        while (count < finalIteration)
-        {
-            //Get dividers at finalIteration - 2 (to access child nodes)
-            foreach (var divider in dividerList.Where(x => x.depth == finalIteration - count))
-            {
-                if (divider.leftChild != null && divider.rightChild != null)
+                map[x,y] = new Node
                 {
-                    var room2 = divider.leftChild.FindRoomsWithin(roomList);
-                    var room1 = divider.rightChild.FindRoomsWithin(roomList);
-
-                    if (room1 != null && room2 != null)
-                    {
-                        if (room1.Count != 0 && room2.Count != 0)
-                        {
-                            Create_Hallway(room1[0], room2[0]);
-                        }
-                    }
-                }
-            }
-            count++;
-        }
-    }
-
-    private void Create_Hallway(Room roomWithin1, Room roomWithin2)
-    {
-
-        Vector2 center1 = roomWithin1.GetCenter();
-        Vector2 center2 = roomWithin2.GetCenter();
-
-        //Random corridor direction
-        int rng = UnityEngine.Random.Range(0, 2);
-
-        //X then Y
-        if (rng == 0)
-        {
-            //X Left to Right
-            if (center2.x > center1.x)
-            {
-                Hallway hallwayX = new Hallway
-                {
-                    x1 = (int)center1.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
+                    gridX = x,
+                    gridY = y,
+                    walkable = false
                 };
-                hallwayList.Add(hallwayX);
-            }
-            //X Right to Left
-            else if (center2.x < center1.x)
-            {
-                Hallway hallwayX = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center1.x - 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
-                };
-                hallwayList.Add(hallwayX);
-            }
-
-            //Y Down to Up
-            if (center2.y > center1.y)
-            {
-                Hallway hallwayY = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center2.y
-                };
-                hallwayList.Add(hallwayY);
-            }
-            else if (center2.y < center1.y)
-            {
-                Hallway hallwayY = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center2.y,
-                    y2 = (int)center1.y
-                };
-                hallwayList.Add(hallwayY);
-            }
-        }
-        else if (rng == 1)
-        {
-            //Y Down to Up
-            if (center2.y > center1.y)
-            {
-                Hallway hallwayY = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center2.y
-                };
-                hallwayList.Add(hallwayY);
-            }
-            else if (center2.y < center1.y)
-            {
-                Hallway hallwayY = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center2.y,
-                    y2 = (int)center1.y
-                };
-                hallwayList.Add(hallwayY);
-            }
-
-            //X Left to Right
-            if (center2.x > center1.x)
-            {
-                Hallway hallwayX = new Hallway
-                {
-                    x1 = (int)center1.x,
-                    x2 = (int)center2.x + 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
-                };
-                hallwayList.Add(hallwayX);
-            }
-            //X Right to Left
-            else if (center2.x < center1.x)
-            {
-                Hallway hallwayX = new Hallway
-                {
-                    x1 = (int)center2.x,
-                    x2 = (int)center1.x - 1,
-                    y1 = (int)center1.y,
-                    y2 = (int)center1.y + 1
-                };
-                hallwayList.Add(hallwayX);
             }
         }
     }
@@ -287,10 +162,10 @@ public class DungeonGenerator : MonoBehaviour
         {
             id = 0,
             depth = 0,
-            x1 = 0,
-            y1 = 0,
-            x2 = mapWidth,
-            y2 = mapHeight
+            x1 = roomMaxSize * 2,
+            y1 = roomMaxSize * 2,
+            x2 = mapWidth - roomMaxSize * 2,
+            y2 = mapHeight - roomMaxSize * 2
         };
 
         dividerList.Add(root);
@@ -352,6 +227,156 @@ public class DungeonGenerator : MonoBehaviour
         finalIteration++;
         Recursive_BSP_Split(currentDepth + 1);
     }
+
+    private void Random_Place_Rooms()
+    {
+        foreach (var divider in dividerList.Where(x => x.depth == finalIteration))
+        {
+            int _x1 = UnityEngine.Random.Range(divider.x1, divider.x2 - roomMaxSize);
+            int _y1 = UnityEngine.Random.Range(divider.y1, divider.y2 - roomMaxSize);
+            int _x2 = UnityEngine.Random.Range(_x1 + roomMinSize, _x1 + roomMaxSize);
+            int _y2 = UnityEngine.Random.Range(_y1 + roomMinSize, _y1 + roomMaxSize);
+
+            Room room = new Room {
+                x1 = _x1,
+                x2 = _x2,
+                y1 = _y1,
+                y2 = _y2,
+            };
+
+            divider.roomWithin = room;
+            roomList.Add(room);
+        }
+    }
+
+    private void Generate_Hallways()
+    {
+
+        //Get dividers at finalIteration - 1 (to access child nodes)
+        foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 1))
+        {
+            if (divider.leftChild != null && divider.rightChild != null)
+            {
+                Create_Hallway(divider.leftChild.roomWithin, divider.rightChild.roomWithin);
+            }
+        }
+
+        int count = 2;
+        while (count < finalIteration+1)
+        {
+            //Get dividers at finalIteration - 2 (to access child nodes)
+            foreach (var divider in dividerList.Where(x => x.depth == finalIteration - count))
+            {
+                if (divider.leftChild != null && divider.rightChild != null)
+                {
+                    var room2 = divider.leftChild.FindRoomsWithin(roomList);
+                    var room1 = divider.rightChild.FindRoomsWithin(roomList);
+
+                    if (room1 != null && room2 != null)
+                    {
+                        if (room1.Count != 0 && room2.Count != 0)
+                        {
+                            Create_Hallway(room1[0], room2[0]);
+                        }
+                    }
+                }
+            }
+            count++;
+        }
+    }
+
+    private void Update_Node_Map()
+    {
+        //Update rooms
+        foreach (var room in roomList)
+        {
+            for (int x = room.x1; x < room.x2; x++)
+            {
+                for (int y = room.y1; y < room.y2; y++)
+                {
+                    map[x, y].walkable = true;
+                }
+            }
+        }
+
+        //Update hallways
+        foreach (var item in hallwayList)
+        {
+            if (item.x1 < item.x2)
+            {
+                for (int x = item.x1; x < item.x2; x++)
+                {
+                    for (int y = item.y1; y < item.y2; y++)
+                    {
+                        map[x, y].walkable = true;
+                    }
+                }
+            }
+            if (item.x1 > item.x2)
+            {
+                for (int x = item.x2; x > item.x2; x--)
+                {
+                    for (int y = item.y2; x > item.y2; y--)
+                    {
+                        map[x, y].walkable = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private void Instantiate_Terrain_Objects()
+    {
+        if (testMode)
+        {
+            return;
+        }
+
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (map[x,y].walkable)
+                {
+                    Instantiate(floorObj, new Vector3(x, -0.5f, y), Quaternion.identity, this.transform);
+                }
+                else
+                {
+                    if (drawWalls)
+                    {
+                        Instantiate(wallObj, new Vector3(x, 0.5f, y), Quaternion.identity, this.transform);
+                    }
+                }
+            }
+        }
+    }
+
+    private void Create_Player_And_Goal_Objects()
+    {
+        int randomRoomIndex = UnityEngine.Random.Range(0, roomList.Count - 1);
+
+        GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].GetV3Center(), Quaternion.identity);
+
+        GameObject cam = Instantiate(camObj);
+        cam.GetComponent<BasicCameraMovement>().target = player;
+
+    }
+
+    private void Pass_Map_To_Grid()
+    {
+        Grid.instance.grid = map;
+        Grid.instance.gridSizeX = mapWidth;
+        Grid.instance.gridSizeY = mapHeight;
+
+    }
+    /*
+    ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
+    ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝
+    ███████║█████╗░░██║░░░░░██████╔╝█████╗░░██████╔╝╚█████╗░
+    ██╔══██║██╔══╝░░██║░░░░░██╔═══╝░██╔══╝░░██╔══██╗░╚═══██╗
+    ██║░░██║███████╗███████╗██║░░░░░███████╗██║░░██║██████╔╝
+    ╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═════╝░
+    */
 
     private void CarveDivider(Divider divider, Axis axis)
     {
@@ -421,21 +446,137 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    public int layer;
+    private void Create_Hallway(Room roomWithin1, Room roomWithin2)
+    {
+
+        Vector2 center1 = roomWithin1.GetV2Center();
+        Vector2 center2 = roomWithin2.GetV2Center();
+
+        //Random corridor direction
+        int rng = UnityEngine.Random.Range(0, 2);
+
+        //X then Y
+        if (rng == 0)
+        {
+            //X Left to Right
+            if (center2.x > center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center1.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 2
+                };
+                hallwayList.Add(hallwayX);
+            }
+            //X Right to Left
+            else if (center2.x < center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center1.x - 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 2
+                };
+                hallwayList.Add(hallwayX);
+            }
+
+            //Y Down to Up
+            if (center2.y > center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center2.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+            else if (center2.y < center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center2.y,
+                    y2 = (int)center1.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+        }
+        else if (rng == 1)
+        {
+            //Y Down to Up
+            if (center2.y > center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center2.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+            else if (center2.y < center1.y)
+            {
+                Hallway hallwayY = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center2.y,
+                    y2 = (int)center1.y
+                };
+                hallwayList.Add(hallwayY);
+            }
+
+            //X Left to Right
+            if (center2.x > center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center1.x,
+                    x2 = (int)center2.x + 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 2
+                };
+                hallwayList.Add(hallwayX);
+            }
+            //X Right to Left
+            else if (center2.x < center1.x)
+            {
+                Hallway hallwayX = new Hallway
+                {
+                    x1 = (int)center2.x,
+                    x2 = (int)center1.x - 2,
+                    y1 = (int)center1.y,
+                    y2 = (int)center1.y + 2
+                };
+                hallwayList.Add(hallwayX);
+            }
+        }
+        
+    }
 
     private bool DividerCanBeCarvedX(Divider divider)
     {
-        return !((divider.x2 - divider.x1) < (roomMaxSize * 2));
+        return !((divider.x2 - divider.x1) < (roomMaxSize * roomOverlapPreventionFactor));
     }
 
     private bool DividerCanBeCarvedY(Divider divider)
     {
-        return !((divider.y2 - divider.y1) < (roomMaxSize * 2));
+        return !((divider.y2 - divider.y1) < (roomMaxSize * roomOverlapPreventionFactor));
     }
 
     private void OnDrawGizmos()
     {
-
+        if (!testMode)
+        {
+            return;
+        }
         foreach (var item in hallwayList)
         {
             if (item.x1 < item.x2)
@@ -487,7 +628,21 @@ public class DungeonGenerator : MonoBehaviour
         }
 
 
-        foreach (var item in dividerList.Where(x => x.depth == layer).ToList())
+
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (x == 0 || y == 0 || x == mapWidth-1 || y == mapHeight-1)
+                {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
+                }
+            }
+        }
+
+
+        foreach (var item in dividerList.Where(x => x.depth == numberDivides-1).ToList())
         {
             {
                 Gizmos.color = Color.red;

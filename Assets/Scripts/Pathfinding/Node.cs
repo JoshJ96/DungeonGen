@@ -13,14 +13,6 @@ public class Node
 	public int hCost;
 	public Node parent;
 
-	//public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY)
-	//{
-	//	walkable = _walkable;
-	//	worldPosition = _worldPos;
-	//	gridX = _gridX;
-	//	gridY = _gridY;
-	//}
-
 	public int fCost
 	{
 		get
@@ -28,4 +20,6 @@ public class Node
 			return gCost + hCost;
 		}
 	}
+
+	public Vector3 GetWorldPoint() => new Vector3(gridX, 0, gridY);
 }

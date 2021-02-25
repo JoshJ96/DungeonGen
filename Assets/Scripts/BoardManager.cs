@@ -40,27 +40,26 @@ public partial class BoardManager : MonoBehaviour
     {
         if (input == PlayerInput.RotateMode)
         {
-            arrow8Dir.SetTrigger("DisplayArrows");
+            //arrow8Dir.SetTrigger("DisplayArrows");
         }
         else
         {
-            arrow8Dir.SetTrigger("DisableArrows");
+           // arrow8Dir.SetTrigger("DisableArrows");
         }
         playerInput = input;
     }
 
     #endregion
 
-    public Grid worldGrid;
     Pathfinding pathfinding;
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
     bool canInput = true;
     public GameObject damageIndicatorObject;
-    public Animator arrow8Dir;
+   // public Animator //arrow8Dir;
 
     private void Start()
     {
-        //worldGrid = GetComponent<Grid>();
+        //Grid.instance.grid = GetComponent<Grid>();
         pathfinding = GetComponent<Pathfinding>();
         GameEvents.instance.turnPass += TurnPass;
         GameEvents.instance.doDamage += DoDamage;
@@ -130,7 +129,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleWaitingForPlayerAttackEnd()
     {
-        arrow8Dir.SetTrigger("DisableArrows");
+        //arrow8Dir.SetTrigger("DisableArrows");
         canInput = false;
         if (!PlayerUnit.instance.isAttacking)
         {
@@ -151,7 +150,7 @@ public partial class BoardManager : MonoBehaviour
     {
         canInput = false;
         Node currentPlayerNode = PlayerUnit.instance.GetCurrentNode();
-        Node desiredNodeLocation = worldGrid.grid[
+        Node desiredNodeLocation = Grid.instance.grid[
             currentPlayerNode.gridX + Mathf.RoundToInt(GetInputVector().x),
             currentPlayerNode.gridY + Mathf.RoundToInt(GetInputVector().z)
             ];
@@ -164,7 +163,7 @@ public partial class BoardManager : MonoBehaviour
         }
         else
         {
-            PlayerUnit.instance.RotateTowards(desiredNodeLocation.worldPosition);
+            PlayerUnit.instance.RotateTowards(desiredNodeLocation.GetWorldPoint());
             canInput = true;
             GameEvents.instance.TurnPass();
         }
@@ -226,7 +225,7 @@ public partial class BoardManager : MonoBehaviour
         //Move all units
         foreach (var unit in toMove)
         {
-            unit.MoveUnit(unit.GetDesiredNode().worldPosition);
+            unit.MoveUnit(unit.GetDesiredNode().GetWorldPoint());
         }
 
         //Exit the state
@@ -244,13 +243,13 @@ public partial class BoardManager : MonoBehaviour
             pathfinding.FindPath(unit.transform.position, PlayerUnit.instance.transform.position);
 
             //Save desired node if it's not a dupe
-            if (worldGrid.path != null)
+            if (Grid.instance.path != null)
             {
-                if (worldGrid.path.Count != 0)
+                if (Grid.instance.path.Count != 0)
                 {
-                    if (!IsDuplicateDesiredNode(worldGrid.path[0]))
+                    if (!IsDuplicateDesiredNode(Grid.instance.path[0]))
                     {
-                        unit.SetDesiredNode(worldGrid.path[0]);
+                        unit.SetDesiredNode(Grid.instance.path[0]);
                     }
                 }
             }
@@ -266,7 +265,7 @@ public partial class BoardManager : MonoBehaviour
         foreach (EnemyUnit unit in enemyPatrolUnits)
         {
             //Get surrounding nodes (walkable only)
-            List<Node> surroundingNodes = worldGrid.GetNeighbours(worldGrid.NodeFromWorldPoint(unit.transform.position)).Where(x => x.walkable).ToList();
+            List<Node> surroundingNodes = Grid.instance.GetNeighbours(Grid.instance.NodeFromWorldPoint(unit.transform.position)).Where(x => x.walkable).ToList();
 
             //Pick random nodes until an unclaimed one is found. If none is ever found, that's ok. The unit will be skipped
             while (surroundingNodes.Count != 0)
@@ -291,7 +290,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleEnemyAttack()
     {
-        arrow8Dir.SetTrigger("DisableArrows");
+       // arrow8Dir.SetTrigger("DisableArrows");
         if (!enemyAttackingUnits[0].isAttacking)
         {
             enemyAttackingUnits.RemoveAt(0);
@@ -311,7 +310,7 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleWaitingForEnemyMovementEnd()
     {
-        arrow8Dir.SetTrigger("DisableArrows");
+       //arrow8Dir.SetTrigger("DisableArrows");
         //Once all units are done with their move, the next phase can begin
         if (!AnyUnitsMoving())
         {

@@ -21,6 +21,7 @@ public class PlayerUnit : Unit
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
+        print(GetCurrentNode().gridX + " " + GetCurrentNode().gridY);
     }
 
     private void Update()
@@ -33,6 +34,7 @@ public class PlayerUnit : Unit
         {
             blendValue -= 4 * Time.deltaTime;
         }
+
         blendValue = Mathf.Clamp(blendValue, 0, 1);
         animator.SetFloat("Blend", blendValue);
     }
