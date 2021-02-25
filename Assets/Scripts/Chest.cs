@@ -12,7 +12,7 @@ public class Chest : MonoBehaviour
     {
         foreach (Vector3 tile in interactTiles)
         {
-            if (PlayerUnit.instance.GetCurrentNode().worldPosition == Grid.instance.NodeFromWorldPoint(transform.position + tile).worldPosition)
+            if (PlayerUnit.instance.GetCurrentNode().GetWorldPoint() == Grid.instance.NodeFromWorldPoint(transform.position + tile).GetWorldPoint())
             {
                 if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
                 {

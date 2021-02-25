@@ -21,7 +21,6 @@ public class PlayerUnit : Unit
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
-        print(GetCurrentNode().gridX + " " + GetCurrentNode().gridY);
     }
 
     private void Update()
@@ -58,7 +57,7 @@ public class PlayerUnit : Unit
             var hi = unit.GetCurrentNode();
             var hi2 = Grid.instance.NodeFromWorldPoint(tileToCheck);
 
-            if (unit.GetCurrentNode().worldPosition == Grid.instance.NodeFromWorldPoint(tileToCheck).worldPosition)
+            if (unit.GetCurrentNode().GetWorldPoint() == Grid.instance.NodeFromWorldPoint(tileToCheck).GetWorldPoint())
             {
                 print($"Sending an attack to {unit.gameObject.name}");
                 attackTargets.Add(unit);

@@ -35,10 +35,22 @@ public class EnemyUnit : Unit
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
+        var hi = GetCurrentNode();
+
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
+
         animator = GetComponent<Animator>();
+    }
+
+    public override void MoveUnit(Vector3 destination)
+    {
+        destination = new Vector3(destination.x, transform.position.y, destination.z);
+        SetCurrentNode(Grid.instance.NodeFromWorldPoint(destination));
+        Grid.instance.NodeFromWorldPoint(transform.position).walkable = true;
+        Grid.instance.NodeFromWorldPoint(destination).walkable = false;
+        StartCoroutine(Move(destination));
     }
 
     private void LateUpdate()
@@ -53,10 +65,9 @@ public class EnemyUnit : Unit
     //If a player is within aggro range, change the current state
     public void ScanForPlayerInAggroRange()
     {
-        foreach (Vector3 position in GetRange(aggroRange))
+        foreach (Node node in GetRange(aggroRange))
         {
-            if (   PlayerUnit.instance.transform.position.x == position.x
-                && PlayerUnit.instance.transform.position.z == position.z)
+            if (PlayerUnit.instance.GetCurrentNode().GetWorldPoint() == node.GetWorldPoint())
             {
                 SetState(EnemyStates.TargetingPlayer);
                 return;
@@ -67,10 +78,9 @@ public class EnemyUnit : Unit
 
     public void ScanForPlayerInAttackRange()
     {
-        foreach (Vector3 position in GetRange(attackRange))
+        foreach (Node node in GetRange(attackRange))
         {
-            if (   PlayerUnit.instance.transform.position.x == position.x
-                && PlayerUnit.instance.transform.position.z == position.z)
+            if (PlayerUnit.instance.GetCurrentNode().GetWorldPoint() == node.GetWorldPoint())
             {
                 SetState(EnemyStates.PlayerInAttackRange);
                 return;

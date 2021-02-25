@@ -51,16 +51,11 @@ public partial class BoardManager : MonoBehaviour
 
     #endregion
 
-    Pathfinding pathfinding;
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
     bool canInput = true;
-    public GameObject damageIndicatorObject;
-   // public Animator //arrow8Dir;
 
     private void Start()
     {
-        //Grid.instance.grid = GetComponent<Grid>();
-        pathfinding = GetComponent<Pathfinding>();
         GameEvents.instance.turnPass += TurnPass;
         GameEvents.instance.doDamage += DoDamage;
     }
@@ -71,9 +66,9 @@ public partial class BoardManager : MonoBehaviour
         {
             if (item.CompareTag("Overhead Location"))
             {
-                GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(transform.rotation.x,0,0)));
+                //GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(transform.rotation.x,0,0)));
 
-                damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
+                //damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
                 return;
             }
         }
@@ -240,7 +235,7 @@ public partial class BoardManager : MonoBehaviour
         //Loop through each patrol unit and find the first element of it's A* path
         foreach (EnemyUnit unit in enemyPatrolUnits)
         {
-            pathfinding.FindPath(unit.transform.position, PlayerUnit.instance.transform.position);
+            Grid.instance.FindPath(unit.GetCurrentNode(), PlayerUnit.instance.GetComponent<Unit>().GetCurrentNode());
 
             //Save desired node if it's not a dupe
             if (Grid.instance.path != null)

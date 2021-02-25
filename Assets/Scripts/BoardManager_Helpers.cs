@@ -41,7 +41,7 @@ public partial class BoardManager : MonoBehaviour
         List<Unit> units = GameObject.FindObjectsOfType<Unit>().Where(x => x.GetDesiredNode() != null).ToList();
         foreach (var item in units)
         {
-            if (toCheck.worldPosition == item.GetDesiredNode().worldPosition)
+            if (toCheck.GetWorldPoint() == item.GetDesiredNode().GetWorldPoint())
             {
                 return true;
             }

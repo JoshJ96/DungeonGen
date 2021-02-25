@@ -55,14 +55,14 @@ public class Grid_GFX : MonoBehaviour
         {
             GL.Begin(GL.LINES);
             GL.Color(new Color(0, 0, 0, 0.1f));
-            GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z + 0.5f);
-            GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);
-            GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z - 0.5f);
-            GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z - 0.5f);
-            GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z - 0.5f);
-            GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z + 0.5f);
-            GL.Vertex3(node.worldPosition.x - 0.5f, 0, node.worldPosition.z + 0.5f);
-            GL.Vertex3(node.worldPosition.x + 0.5f, 0, node.worldPosition.z + 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x + 0.5f, 0, node.GetWorldPoint().z + 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x + 0.5f, 0, node.GetWorldPoint().z - 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x + 0.5f, 0, node.GetWorldPoint().z - 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x - 0.5f, 0, node.GetWorldPoint().z - 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x - 0.5f, 0, node.GetWorldPoint().z - 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x - 0.5f, 0, node.GetWorldPoint().z + 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x - 0.5f, 0, node.GetWorldPoint().z + 0.5f);
+            GL.Vertex3(node.GetWorldPoint().x + 0.5f, 0, node.GetWorldPoint().z + 0.5f);
         }
         GL.End();
         GL.PopMatrix();

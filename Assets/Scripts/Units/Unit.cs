@@ -60,11 +60,10 @@ public class Unit : MonoBehaviour
     public bool isAttacking = false;
 
     //Build a range of nodes from the distance given (used for aggro/attack ranges)
-    public List<Vector3> GetRange(int distance)
+    public List<Node> GetRange(int distance)
     {
-
         //Initialize List
-        List<Vector3> range = new List<Vector3>();
+        List<Node> range = new List<Node>();
 
         //Build Vector3s based on distance
         for (int i = -distance; i <= distance; i++)
@@ -74,7 +73,7 @@ public class Unit : MonoBehaviour
                 if (i == 0 && j == 0)
                     continue;
 
-                range.Add(new Vector3(transform.position.x + i, 0, transform.position.z + j));
+                range.Add(Grid.instance.grid[GetCurrentNode().gridX + i, GetCurrentNode().gridY + j]);
             }
         }
         return range;
@@ -84,22 +83,25 @@ public class Unit : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         //Draw attack range
-        foreach (var tile in GetRange(aggroRange))
+        foreach (Node node in GetRange(aggroRange))
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(tile, Vector3.one);
+            Gizmos.DrawWireCube(node.GetWorldPoint(), Vector3.one);
         }
         //Draws attack range
-        foreach (var tile in GetRange(attackRange))
+        foreach (Node node in GetRange(attackRange))
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(tile, Vector3.one);
+            Gizmos.DrawWireCube(node.GetWorldPoint(), Vector3.one);
         }
     }
 
-    public void MoveUnit(Vector3 destination)
+    public virtual void MoveUnit(Vector3 destination)
     {
         destination = new Vector3(destination.x, transform.position.y, destination.z);
+        SetCurrentNode(Grid.instance.NodeFromWorldPoint(destination));
+        //Grid.instance.NodeFromWorldPoint(transform.position).walkable = true;
+        //Grid.instance.NodeFromWorldPoint(destination).walkable = false;
         StartCoroutine(Move(destination));
     }
 
