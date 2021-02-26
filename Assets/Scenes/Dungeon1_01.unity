@@ -166,7 +166,7 @@ MonoBehaviour:
   camObj: {fileID: 959378775145398938, guid: f477b92ecf8b52a47b465f88796872d2, type: 3}
   bspDeviation: 0.05
   testMode: 0
-  drawWalls: 0
+  drawWalls: 1
 --- !u!4 &433419540
 Transform:
   m_ObjectHideFlags: 0
