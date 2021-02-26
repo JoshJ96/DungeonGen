@@ -14,9 +14,9 @@ public class Grid : MonoBehaviour
 	public bool gizmo = false;
 	public List<Node> path;
 	public Transform seeker, target;
+	public Color gridColorNormal, gridColorPlayer;
 
-
-	public void FindPath(Node start, Node target)
+    public void FindPath(Node start, Node target)
 	{
 		List<Node> openSet = new List<Node>();
 		HashSet<Node> closedSet = new HashSet<Node>();
@@ -160,4 +160,72 @@ public class Grid : MonoBehaviour
 		}
 		*/
 	}
+
+	static Material lineMaterial;
+	static void CreateLineMaterial()
+	{
+		if (!lineMaterial)
+		{
+			// Unity has a built-in shader that is useful for drawing
+			// simple colored things.
+			Shader shader = Shader.Find("Hidden/Internal-Colored");
+			lineMaterial = new Material(shader);
+			lineMaterial.hideFlags = HideFlags.HideAndDontSave;
+			// Turn on alpha blending
+			lineMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+			lineMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+			// Turn backface culling off
+			lineMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+			// Turn off depth writes
+			lineMaterial.SetInt("_ZWrite", 0);
+		}
+	}
+
+	public void OnRenderObject()
+	{
+		CreateLineMaterial();
+		// Apply the line material
+		lineMaterial.SetPass(0);
+
+		GL.PushMatrix();
+		//Set transformation matrix for drawing to
+		//match our transform
+		GL.MultMatrix(transform.localToWorldMatrix);
+		//Draw grid cells
+		for (float x = (int)PlayerUnit.instance.transform.position.x - 15; x < (int)PlayerUnit.instance.transform.position.x + 15; x++)
+		{
+			for (float y = (int)PlayerUnit.instance.transform.position.z - 15; y < (int)PlayerUnit.instance.transform.position.z + 15; y++)
+			{
+                if (NodeFromWorldPoint(new Vector3(x,0,y)).walkable)
+                {
+					GL.Begin(GL.LINES);
+					GL.Color(gridColorNormal);
+					GL.Vertex3(x + 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y + 0.49f);
+				}
+				if (PlayerUnit.instance.GetCurrentNode().GetWorldPoint() == new Vector3(x, 0, y))
+				{
+					GL.Begin(GL.LINES);
+					GL.Color(gridColorPlayer);
+					GL.Vertex3(x + 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y - 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x - 0.49f, 0, y + 0.49f);
+					GL.Vertex3(x + 0.49f, 0, y + 0.49f);
+				}
+			}
+		}
+		GL.End();
+		GL.PopMatrix();
+	}
+
 }

@@ -51,6 +51,30 @@ public class Grid_GFX : MonoBehaviour
         //match our transform
         GL.MultMatrix(transform.localToWorldMatrix);
         //Draw grid cells
+
+        GL.Begin(GL.LINES);
+        GL.Color(new Color(255, 255, 255, 0.1f));
+
+        for (float x = (int)PlayerUnit.instance.transform.position.x - 20; x < (int)PlayerUnit.instance.transform.position.x + 20; x++)
+        {
+            for (float y = (int)PlayerUnit.instance.transform.position.z - 20; y < (int)PlayerUnit.instance.transform.position.z + 20; y++)
+            {
+
+                GL.Vertex3(x + 1.0f, 0, y + 1.0f);
+                GL.Vertex3(x + 1.0f, 0, y - 1.0f);
+                GL.Vertex3(x + 1.0f, 0, y - 1.0f);
+                GL.Vertex3(x - 1.0f, 0, y - 1.0f);
+                GL.Vertex3(x - 1.0f, 0, y - 1.0f);
+                GL.Vertex3(x - 1.0f, 0, y + 1.0f);
+                GL.Vertex3(x - 1.0f, 0, y + 1.0f);
+                GL.Vertex3(x + 1.0f, 0, y + 1.0f);
+                GL.End();
+                GL.PopMatrix();
+            }
+        }
+
+
+
         foreach (Node node in Grid.instance.grid)
         {
             GL.Begin(GL.LINES);

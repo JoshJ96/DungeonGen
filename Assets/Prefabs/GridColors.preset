@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GridColors
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 0c0317540661a444db653dd673580c19,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridSizeX
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridSizeY
+    value: 209
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gizmo
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: seeker
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: target
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorNormal.r
+    value: 0.5283019
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorNormal.g
+    value: 0.5283019
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorNormal.b
+    value: 0.5283019
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorNormal.a
+    value: 0.30588236
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorPlayer.r
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorPlayer.g
+    value: 0.3920169
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorPlayer.b
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: gridColorPlayer.a
+    value: 1
+    objectReference: {fileID: 0}
+  m_ExcludedProperties: []
