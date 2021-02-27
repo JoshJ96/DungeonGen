@@ -71,7 +71,7 @@ public partial class BoardManager : MonoBehaviour
     private void ReadForInputs()
     {
         //Primary attack key pressed
-        if (Input.GetKeyDown(KeyCode.JoystickButton2) || Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.JoystickButton2) || Input.GetMouseButton(0))
         {
             ChangeState(PlayerInput.PrimaryAttack);
             return;

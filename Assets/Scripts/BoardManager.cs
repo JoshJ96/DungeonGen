@@ -76,8 +76,6 @@ public partial class BoardManager : MonoBehaviour
 
     void Update()
     {
-        print(canInput);
-        print(currentState);
         switch (currentState)
         {
             case States.WaitingForPlayerInput:

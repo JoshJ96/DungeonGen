@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 367886387080014395}
   - component: {fileID: 1485573966935050388}
   m_Layer: 0
-  m_Name: Floor
+  m_Name: Floor_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6779027928636638011
 Transform:
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 460877171e0d5fb498e5ea7e1d6b6127, type: 2}
+  - {fileID: 2100000, guid: 3b0e671962cbf354cb326b82a54070e8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -120,6 +120,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Minimap Icon
+      objectReference: {fileID: 0}
+    - target: {fileID: 2484012736325391739, guid: 74c18f61df89fff4ca4dcbf9ca888ee5,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 7100932322859357951, guid: 74c18f61df89fff4ca4dcbf9ca888ee5,
         type: 3}
