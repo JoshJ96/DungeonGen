@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Node
 {
-	public bool isVisible;
+	public bool visibleOnMap;
+	public Room roomPartOf;
 	public bool walkable;
 	public int gridX;
 	public int gridY;
@@ -21,4 +22,6 @@ public class Node
 	}
 
 	public Vector3 GetWorldPoint() => new Vector3(gridX, 0, gridY);
+
+	public bool NodeRoomIsVisible() => roomPartOf.visibleOnMap;
 }

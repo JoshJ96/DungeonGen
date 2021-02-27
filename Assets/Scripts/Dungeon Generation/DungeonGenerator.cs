@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+//Dungeon data
+
+
 //Divider class definition
 public class Divider
 {
@@ -27,19 +30,21 @@ public class Divider
 
 public class Room
 {
+    public enum Type
+    {
+        Room,
+        Hallway
+    }
+
+    public Type type;
     public bool visibleOnMap;
 
     public Divider dividerParent;
     public int x1, x2, y1, y2;
-    public Vector2 GetV2Center()
-    {
-        return new Vector2((x2 + x1) / 2, (y2 + y1) / 2);
-    }
 
-    public Vector3 GetV3Center()
-    {
-        return new Vector3((x2 + x1) / 2, 0, (y2 + y1) / 2);
-    }
+    public Vector2 V2Center => new Vector2((x2 + x1) / 2, (y2 + y1) / 2);
+
+    public Vector3 V3Center => new Vector3((x2 + x1) / 2, 0, (y2 + y1) / 2);
 
     public List<Node> NodesWithinRoom(Node[,] map)
     {
@@ -55,31 +60,6 @@ public class Room
         return toReturn;
     }
 
-}
-
-public class Hallway
-{
-    public bool visibleOnMap;
-
-    public int x1, x2, y1, y2;
-    public Vector2 GetCenter()
-    {
-        return new Vector2((x2 + x1) / 2, (y2 + y1) / 2);
-    }
-
-    public List<Node> NodesWithinHallway(Node[,] map)
-    {
-        List<Node> toReturn = new List<Node>();
-        for (int x = x1; x < x2; x++)
-        {
-            for (int y = y1; y < y2; y++)
-            {
-                toReturn.Add(map[x, y]);
-            }
-        }
-
-        return toReturn;
-    }
 }
 
 public class DungeonGenerator : MonoBehaviour
@@ -111,7 +91,6 @@ public class DungeonGenerator : MonoBehaviour
     Divider root;
     public List<Divider> dividerList = new List<Divider>();
     public List<Room> roomList = new List<Room>();
-    public List<Hallway> hallwayList = new List<Hallway>();
     int finalIteration = 0;
 
     public Node[,] map;
@@ -141,7 +120,6 @@ public class DungeonGenerator : MonoBehaviour
 
             dividerList.Clear();
             roomList.Clear();
-            hallwayList.Clear();
             finalIteration = 0;
             GenerateDungeon();
         }
@@ -163,8 +141,13 @@ public class DungeonGenerator : MonoBehaviour
         Instantiate_Terrain_Objects();
         Create_Player_And_Goal_Objects();
         Pass_Map_To_Grid();
+        //Test();
     }
 
+    void Test()
+    {
+        GetComponent<MeshGeneration>().BuildMesh(mapWidth, mapHeight);
+    }
 
 
     private void Initialize_Node_Map()
@@ -270,6 +253,7 @@ public class DungeonGenerator : MonoBehaviour
             int _y2 = UnityEngine.Random.Range(_y1 + roomMinSize, _y1 + roomMaxSize);
 
             Room room = new Room {
+                type = Room.Type.Room,
                 visibleOnMap = false,
                 x1 = _x1,
                 x2 = _x2,
@@ -320,39 +304,27 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Update_Node_Map()
     {
-        //Update rooms
-        foreach (var room in roomList)
+        //Update rooms and hallways
+        foreach (var room in roomList.Where(x => x.type == Room.Type.Hallway))
         {
             for (int x = room.x1; x < room.x2; x++)
             {
                 for (int y = room.y1; y < room.y2; y++)
                 {
+                    map[x, y].roomPartOf = room;
                     map[x, y].walkable = true;
                 }
             }
         }
 
-        //Update hallways
-        foreach (var item in hallwayList)
+        foreach (var room in roomList.Where(x => x.type == Room.Type.Room))
         {
-            if (item.x1 < item.x2)
+            for (int x = room.x1; x < room.x2; x++)
             {
-                for (int x = item.x1; x < item.x2; x++)
+                for (int y = room.y1; y < room.y2; y++)
                 {
-                    for (int y = item.y1; y < item.y2; y++)
-                    {
-                        map[x, y].walkable = true;
-                    }
-                }
-            }
-            if (item.x1 > item.x2)
-            {
-                for (int x = item.x2; x > item.x2; x--)
-                {
-                    for (int y = item.y2; x > item.y2; y--)
-                    {
-                        map[x, y].walkable = true;
-                    }
+                    map[x, y].roomPartOf = room;
+                    map[x, y].walkable = true;
                 }
             }
         }
@@ -394,7 +366,7 @@ public class DungeonGenerator : MonoBehaviour
 
         roomList[randomRoomIndex].visibleOnMap = true;
 
-        GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].GetV3Center(), Quaternion.identity);
+        GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].V3Center, Quaternion.identity);
 
         GameObject cam = Instantiate(camObj);
         cam.GetComponent<BasicCameraMovement>().target = player;
@@ -492,8 +464,8 @@ public class DungeonGenerator : MonoBehaviour
     private void Create_Hallway(Room roomWithin1, Room roomWithin2)
     {
 
-        Vector2 center1 = roomWithin1.GetV2Center();
-        Vector2 center2 = roomWithin2.GetV2Center();
+        Vector2 center1 = roomWithin1.V2Center;
+        Vector2 center2 = roomWithin2.V2Center;
 
         //Random corridor direction
         int rng = UnityEngine.Random.Range(0, 2);
@@ -504,54 +476,58 @@ public class DungeonGenerator : MonoBehaviour
             //X Left to Right
             if (center2.x > center1.x)
             {
-                Hallway hallwayX = new Hallway
+                Room hallwayX = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center1.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 2
                 };
-                hallwayList.Add(hallwayX);
+                roomList.Add(hallwayX);
             }
             //X Right to Left
             else if (center2.x < center1.x)
             {
-                Hallway hallwayX = new Hallway
+                Room hallwayX = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center1.x - 2,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 2
                 };
-                hallwayList.Add(hallwayX);
+                roomList.Add(hallwayX);
             }
 
             //Y Down to Up
             if (center2.y > center1.y)
             {
-                Hallway hallwayY = new Hallway
+                Room hallwayY = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center2.y
                 };
-                hallwayList.Add(hallwayY);
+                roomList.Add(hallwayY);
             }
             else if (center2.y < center1.y)
             {
-                Hallway hallwayY = new Hallway
+                Room hallwayY = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
                     y2 = (int)center1.y
                 };
-                hallwayList.Add(hallwayY);
+                roomList.Add(hallwayY);
             }
         }
         else if (rng == 1)
@@ -559,54 +535,58 @@ public class DungeonGenerator : MonoBehaviour
             //Y Down to Up
             if (center2.y > center1.y)
             {
-                Hallway hallwayY = new Hallway
+                Room hallwayY = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center2.y
                 };
-                hallwayList.Add(hallwayY);
+                roomList.Add(hallwayY);
             }
             else if (center2.y < center1.y)
             {
-                Hallway hallwayY = new Hallway
+                Room hallwayY = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
                     y2 = (int)center1.y
                 };
-                hallwayList.Add(hallwayY);
+                roomList.Add(hallwayY);
             }
 
             //X Left to Right
             if (center2.x > center1.x)
             {
-                Hallway hallwayX = new Hallway
+                Room hallwayX = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center1.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 2
                 };
-                hallwayList.Add(hallwayX);
+                roomList.Add(hallwayX);
             }
             //X Right to Left
             else if (center2.x < center1.x)
             {
-                Hallway hallwayX = new Hallway
+                Room hallwayX = new Room
                 {
+                    type = Room.Type.Hallway,
                     visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center1.x - 2,
                     y1 = (int)center1.y,
                     y2 = (int)center1.y + 2
                 };
-                hallwayList.Add(hallwayX);
+                roomList.Add(hallwayX);
             }
         }
         
@@ -627,32 +607,6 @@ public class DungeonGenerator : MonoBehaviour
         if (!testMode)
         {
             return;
-        }
-        foreach (var item in hallwayList)
-        {
-            if (item.x1 < item.x2)
-            {
-                for (int x = item.x1; x < item.x2; x++)
-                {
-                    for (int y = item.y1; y < item.y2; y++)
-                    {
-                        Gizmos.color = Color.blue;
-                        Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                    }
-                }
-            }
-            if (item.x1 > item.x2)
-            {
-                for (int x = item.x2; x > item.x2; x--)
-                {
-                    for (int y = item.y2; x > item.y2; y--)
-                    {
-                        Gizmos.color = Color.grey;
-                        Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
-                    }
-                }
-            }
-
         }
 
         foreach (var divider in dividerList.Where(x => x.depth == finalIteration - 1))
