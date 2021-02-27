@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Node
 {
-
+	public bool isVisible;
 	public bool walkable;
 	public int gridX;
 	public int gridY;

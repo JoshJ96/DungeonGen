@@ -27,6 +27,8 @@ public class Divider
 
 public class Room
 {
+    public bool visibleOnMap;
+
     public Divider dividerParent;
     public int x1, x2, y1, y2;
     public Vector2 GetV2Center()
@@ -39,14 +41,44 @@ public class Room
         return new Vector3((x2 + x1) / 2, 0, (y2 + y1) / 2);
     }
 
+    public List<Node> NodesWithinRoom(Node[,] map)
+    {
+        List<Node> toReturn = new List<Node>();
+        for (int x = x1; x < x2; x++)
+        {
+            for (int y = y1; y < y2; y++)
+            {
+                toReturn.Add(map[x, y]);
+            }
+        }
+
+        return toReturn;
+    }
+
 }
 
 public class Hallway
 {
+    public bool visibleOnMap;
+
     public int x1, x2, y1, y2;
     public Vector2 GetCenter()
     {
         return new Vector2((x2 + x1) / 2, (y2 + y1) / 2);
+    }
+
+    public List<Node> NodesWithinHallway(Node[,] map)
+    {
+        List<Node> toReturn = new List<Node>();
+        for (int x = x1; x < x2; x++)
+        {
+            for (int y = y1; y < y2; y++)
+            {
+                toReturn.Add(map[x, y]);
+            }
+        }
+
+        return toReturn;
     }
 }
 
@@ -238,6 +270,7 @@ public class DungeonGenerator : MonoBehaviour
             int _y2 = UnityEngine.Random.Range(_y1 + roomMinSize, _y1 + roomMaxSize);
 
             Room room = new Room {
+                visibleOnMap = false,
                 x1 = _x1,
                 x2 = _x2,
                 y1 = _y1,
@@ -353,7 +386,13 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Create_Player_And_Goal_Objects()
     {
+        if (testMode)
+        {
+            return;
+        }
         int randomRoomIndex = UnityEngine.Random.Range(0, roomList.Count - 1);
+
+        roomList[randomRoomIndex].visibleOnMap = true;
 
         GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].GetV3Center(), Quaternion.identity);
 
@@ -364,6 +403,10 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Pass_Map_To_Grid()
     {
+        if (testMode)
+        {
+            return;
+        }
         Grid.instance.grid = map;
         Grid.instance.gridSizeX = mapWidth;
         Grid.instance.gridSizeY = mapHeight;
@@ -463,6 +506,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayX = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center1.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
@@ -475,6 +519,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayX = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center1.x - 2,
                     y1 = (int)center1.y,
@@ -488,6 +533,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayY = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
@@ -499,6 +545,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayY = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
@@ -514,6 +561,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayY = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
@@ -525,6 +573,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayY = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center2.y,
@@ -538,6 +587,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayX = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center1.x,
                     x2 = (int)center2.x + 2,
                     y1 = (int)center1.y,
@@ -550,6 +600,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Hallway hallwayX = new Hallway
                 {
+                    visibleOnMap = false,
                     x1 = (int)center2.x,
                     x2 = (int)center1.x - 2,
                     y1 = (int)center1.y,

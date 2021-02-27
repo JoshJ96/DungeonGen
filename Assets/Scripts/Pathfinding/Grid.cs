@@ -227,5 +227,4 @@ public class Grid : MonoBehaviour
 		GL.End();
 		GL.PopMatrix();
 	}
-
 }

@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GoodPerformance
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 14c371af4fdd4064ead85e3acee9f14c,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapWidth
+    value: 98
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapHeight
+    value: 92
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: roomMinSize
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: roomMaxSize
+    value: 12
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: roomOverlapPreventionFactor
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: numberDivides
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: wallObj
+    value: 
+    objectReference: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: floorObj
+    value: 
+    objectReference: {fileID: 1001726653373610900, guid: a1c19f4aff57dcc4c8cb18d5e6666d0d,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: playerObj
+    value: 
+    objectReference: {fileID: 8472271646588490433, guid: 5f71644e8074f05489160a004f3423a2,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: camObj
+    value: 
+    objectReference: {fileID: 959378775145398938, guid: f477b92ecf8b52a47b465f88796872d2,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: bspDeviation
+    value: 0.05
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: testMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: drawWalls
+    value: 1
+    objectReference: {fileID: 0}
+  m_ExcludedProperties: []
