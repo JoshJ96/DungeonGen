@@ -21,7 +21,7 @@ MonoBehaviour:
     value: 0.44
   threshold:
     overrideState: 1
-    value: 0.53
+    value: 0.47
   softKnee:
     overrideState: 0
     value: 1
@@ -105,7 +105,7 @@ MonoBehaviour:
     value: 0
   intensity:
     overrideState: 1
-    value: 4
+    value: 1.74
   color:
     overrideState: 1
     value: {r: 0, g: 0, b: 0, a: 1}
@@ -151,6 +151,34 @@ MonoBehaviour:
   - {fileID: -5200544683862673799}
   - {fileID: 8873185828758992674}
   - {fileID: 4590183252453760134}
+  - {fileID: 2637318893270551481}
+  - {fileID: 8266176271952574886}
+--- !u!114 &2637318893270551481
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6050e2d5de785ce4d931e4dbdbf2d755, type: 3}
+  m_Name: ChromaticAberration
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
+    overrideState: 1
+    value: 1
+  spectralLut:
+    overrideState: 1
+    value: {fileID: 2800000, guid: 5f51e0b22aa8cb84b9f422576ce87ff9, type: 3}
+    defaultState: 1
+  intensity:
+    overrideState: 1
+    value: 0
+  fastMode:
+    overrideState: 1
+    value: 1
 --- !u!114 &4590183252453760134
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -163,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
@@ -255,7 +283,7 @@ MonoBehaviour:
     value: 100
   lift:
     overrideState: 1
-    value: {x: 0.95207685, y: 0.99096644, z: 1, w: 0}
+    value: {x: 0.80725086, y: 0.9212203, z: 1, w: 0}
   gamma:
     overrideState: 0
     value: {x: 1, y: 0.7830188, z: 0.80099124, w: 0}
@@ -1462,6 +1490,28 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
+--- !u!114 &8266176271952574886
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b94fcd11afffcb142908bfcb1e261fba, type: 3}
+  m_Name: MotionBlur
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  shutterAngle:
+    overrideState: 1
+    value: 270
+  sampleCount:
+    overrideState: 1
+    value: 19
 --- !u!114 &8873185828758992674
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -391,7 +391,6 @@ public class DungeonGenerator : MonoBehaviour
             map = this.map,
             playerSpawnRoom = playerSpawnRoom
         };
-
         GameEvents.instance.PushDungeonData(data);
     }
 
