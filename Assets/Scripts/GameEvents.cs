@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class GameEvents : MonoBehaviour
 {
+    private void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     #region Singleton
     public static GameEvents instance;
     void Awake()

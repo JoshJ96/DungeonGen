@@ -262,16 +262,16 @@ MonoBehaviour:
   mapWidth: 100
   mapHeight: 100
   roomMinSize: 5
-  roomMaxSize: 5
-  roomOverlapPreventionFactor: 0.06
-  numberDivides: 8
+  roomMaxSize: 10
+  roomOverlapPreventionFactor: 2.62
+  numberDivides: 5
   wallObj: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd, type: 3}
   floorObj: {fileID: 1001726653373610900, guid: a1c19f4aff57dcc4c8cb18d5e6666d0d,
     type: 3}
   playerObj: {fileID: 8472271646588490433, guid: 5f71644e8074f05489160a004f3423a2,
     type: 3}
   camObj: {fileID: 959378775145398938, guid: f477b92ecf8b52a47b465f88796872d2, type: 3}
-  bspDeviation: 0.05
+  bspDeviation: 0.1
   testMode: 0
   drawWalls: 1
 --- !u!4 &433419540
@@ -1182,7 +1182,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.39
+  m_Intensity: 0.54
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
