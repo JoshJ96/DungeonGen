@@ -20,7 +20,14 @@ public class PlayerUnit : Unit
 
     private void Start()
     {
-        SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
+        GameEvents.instance.pushDungeonData += PushDungeonData;
+    }
+
+    private void PushDungeonData(DungeonData data)
+    {
+        SetCurrentNode(Grid.instance.NodeFromWorldPoint(data.playerSpawnRoom.V3Center));
+
+        transform.position = data.playerSpawnRoom.V3Center;
     }
 
     private void Update()

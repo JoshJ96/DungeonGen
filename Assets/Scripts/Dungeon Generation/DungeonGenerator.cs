@@ -3,10 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 //Dungeon data
-
+public class DungeonData
+{
+    public int mapWidth, mapHeight;
+    public string dungeonName;
+    public int floorNumber;
+    public Node[,] map;
+    public Room playerSpawnRoom;
+}
 
 //Divider class definition
 public class Divider
@@ -76,6 +82,9 @@ public class DungeonGenerator : MonoBehaviour
         Y
     }
 
+    public string dungeonName;
+    public int floorNumber;
+
     //Map size properties
     [Range(20, 500)]
     public int mapWidth;
@@ -101,7 +110,7 @@ public class DungeonGenerator : MonoBehaviour
     public int numberDivides = 6;
     int divides;
 
-    public GameObject wallObj, floorObj, playerObj, camObj, splashObj;
+    public GameObject wallObj, floorObj, playerObj, camObj;
 
     //The % of random coords from middle to be chosen (0.05 = 5%)
     [Range(0, 0.1f)]
@@ -133,24 +142,16 @@ public class DungeonGenerator : MonoBehaviour
 
     private void GenerateDungeon()
     {
-        StartCoroutine(ShowSplashScreen());
         Initialize_Node_Map();
         Initialize_BSP_Root();
         Recursive_BSP_Split(0);
         Random_Place_Rooms();
         Generate_Hallways();
         Update_Node_Map();
-        Instantiate_Terrain_Objects();
-        Create_Player_And_Goal_Objects();
         Pass_Map_To_Grid();
+        Instantiate_Terrain_Objects();
+        Event_Push_Dungeon_Data();
     }
-
-    IEnumerator ShowSplashScreen()
-    {
-        yield return new WaitForSeconds(2);
-        splashObj.SetActive(false);
-    }
-
 
     private void Initialize_Node_Map()
     {
@@ -179,10 +180,10 @@ public class DungeonGenerator : MonoBehaviour
         {
             id = 0,
             depth = 0,
-            x1 = roomMaxSize * 2,
-            y1 = roomMaxSize * 2,
-            x2 = mapWidth - roomMaxSize * 2,
-            y2 = mapHeight - roomMaxSize * 2
+            x1 = roomMaxSize / 2,
+            y1 = roomMaxSize / 2,
+            x2 = mapWidth - roomMaxSize / 2,
+            y2 = mapHeight - roomMaxSize / 2
         };
 
         dividerList.Add(root);
@@ -358,26 +359,6 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    private void Create_Player_And_Goal_Objects()
-    {
-        if (testMode)
-        {
-            return;
-        }
-
-        List<Room> listFullRooms = roomList.Where(x => x.type == Room.Type.Room).ToList();
-
-        int randomRoomIndex = UnityEngine.Random.Range(0, listFullRooms.Count - 1);
-
-        listFullRooms[randomRoomIndex].visibleOnMap = true;
-
-        GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].V3Center, Quaternion.identity);
-
-        GameObject cam = Instantiate(camObj);
-        cam.GetComponent<BasicCameraMovement>().target = player;
-
-    }
-
     private void Pass_Map_To_Grid()
     {
         if (testMode)
@@ -387,8 +368,34 @@ public class DungeonGenerator : MonoBehaviour
         Grid.instance.grid = map;
         Grid.instance.gridSizeX = mapWidth;
         Grid.instance.gridSizeY = mapHeight;
-
     }
+
+    private void Event_Push_Dungeon_Data()
+    {
+        if (testMode)
+        {
+            return;
+        }
+
+        //Get random spawn room for player
+        List<Room> listFullRooms = roomList.Where(x => x.type == Room.Type.Room).ToList();
+        int randomRoomIndex = UnityEngine.Random.Range(0, listFullRooms.Count - 1);
+        listFullRooms[randomRoomIndex].visibleOnMap = true;
+        Room playerSpawnRoom = listFullRooms[randomRoomIndex];
+
+        DungeonData data = new DungeonData {
+            mapWidth = this.mapWidth,
+            mapHeight = this.mapHeight,
+            dungeonName = this.dungeonName,
+            floorNumber = this.floorNumber,
+            map = this.map,
+            playerSpawnRoom = playerSpawnRoom
+        };
+
+        GameEvents.instance.PushDungeonData(data);
+    }
+
+    
     /*
     ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
     ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝

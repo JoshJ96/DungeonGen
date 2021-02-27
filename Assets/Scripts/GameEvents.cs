@@ -51,4 +51,8 @@ public class GameEvents : MonoBehaviour
     public event Action<EnemyUnit> enemyDestruction;
     public void EnemyDestruction(EnemyUnit unit) => enemyDestruction?.Invoke(unit);
 
+    //Dungeon data event
+    public event Action<DungeonData> pushDungeonData;
+    public void PushDungeonData(DungeonData dungeonData) => pushDungeonData?.Invoke(dungeonData);
+
 }

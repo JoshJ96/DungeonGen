@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Grid : MonoBehaviour
 {
@@ -15,6 +16,16 @@ public class Grid : MonoBehaviour
 	public List<Node> path;
 	public Transform seeker, target;
 	public Color gridColorNormal, gridColorPlayer;
+
+    private void Start()
+    {
+		GameEvents.instance.pushDungeonData += PushDungeonData;
+	}
+
+    private void PushDungeonData(DungeonData data)
+    {
+		grid = data.map;
+    }
 
     public void FindPath(Node start, Node target)
 	{
