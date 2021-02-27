@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 //Dungeon data
 
@@ -100,7 +101,7 @@ public class DungeonGenerator : MonoBehaviour
     public int numberDivides = 6;
     int divides;
 
-    public GameObject wallObj, floorObj, playerObj, camObj;
+    public GameObject wallObj, floorObj, playerObj, camObj, splashObj;
 
     //The % of random coords from middle to be chosen (0.05 = 5%)
     [Range(0, 0.1f)]
@@ -132,6 +133,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private void GenerateDungeon()
     {
+        StartCoroutine(ShowSplashScreen());
         Initialize_Node_Map();
         Initialize_BSP_Root();
         Recursive_BSP_Split(0);
@@ -141,12 +143,12 @@ public class DungeonGenerator : MonoBehaviour
         Instantiate_Terrain_Objects();
         Create_Player_And_Goal_Objects();
         Pass_Map_To_Grid();
-        //Test();
     }
 
-    void Test()
+    IEnumerator ShowSplashScreen()
     {
-        GetComponent<MeshGeneration>().BuildMesh(mapWidth, mapHeight);
+        yield return new WaitForSeconds(2);
+        splashObj.SetActive(false);
     }
 
 
@@ -362,9 +364,12 @@ public class DungeonGenerator : MonoBehaviour
         {
             return;
         }
-        int randomRoomIndex = UnityEngine.Random.Range(0, roomList.Count - 1);
 
-        roomList[randomRoomIndex].visibleOnMap = true;
+        List<Room> listFullRooms = roomList.Where(x => x.type == Room.Type.Room).ToList();
+
+        int randomRoomIndex = UnityEngine.Random.Range(0, listFullRooms.Count - 1);
+
+        listFullRooms[randomRoomIndex].visibleOnMap = true;
 
         GameObject player = Instantiate(playerObj, roomList[randomRoomIndex].V3Center, Quaternion.identity);
 
