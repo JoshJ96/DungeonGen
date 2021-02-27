@@ -13,8 +13,8 @@ public class MinimapCamera : MonoBehaviour
 
     private void PushDungeonData(DungeonData data)
     {
-        transform.position = new Vector3(data.mapWidth, 0, data.mapHeight);
-        GetComponent<Camera>().orthographicSize = data.mapWidth;
+        transform.position = new Vector3(data.mapWidth / 2, 1, data.mapHeight / 2);
+        GetComponent<Camera>().orthographicSize = data.mapWidth / 2;
     }
 
 }

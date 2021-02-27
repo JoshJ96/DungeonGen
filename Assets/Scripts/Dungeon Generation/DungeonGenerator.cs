@@ -180,10 +180,10 @@ public class DungeonGenerator : MonoBehaviour
         {
             id = 0,
             depth = 0,
-            x1 = roomMaxSize / 2,
-            y1 = roomMaxSize / 2,
-            x2 = mapWidth - roomMaxSize / 2,
-            y2 = mapHeight - roomMaxSize / 2
+            x1 = roomMaxSize,
+            y1 = roomMaxSize,
+            x2 = mapWidth - roomMaxSize,
+            y2 = mapHeight - roomMaxSize
         };
 
         dividerList.Add(root);

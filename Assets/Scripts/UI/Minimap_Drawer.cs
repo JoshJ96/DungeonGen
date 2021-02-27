@@ -21,7 +21,7 @@ public class Minimap_Drawer : MonoBehaviour
         GameEvents.instance.turnPass += TurnPass;
     }
 
-    int drawRange = 15;
+    int drawRange = 5;
     private void TurnPass()
     {
         if (playerNode == thisNode)

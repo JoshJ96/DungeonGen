@@ -76,6 +76,8 @@ public partial class BoardManager : MonoBehaviour
 
     void Update()
     {
+        print(canInput);
+        print(currentState);
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
@@ -84,6 +86,9 @@ public partial class BoardManager : MonoBehaviour
                     ReadForInputs();
                     switch (playerInput)
                     {
+                        case PlayerInput.PrimaryAttack:
+                            HandlePlayerAttack();
+                            break;
                         case PlayerInput.Move:
                             HandlePlayerMovement();
                             break;
@@ -95,9 +100,6 @@ public partial class BoardManager : MonoBehaviour
                             break;
                         case PlayerInput.RotateMode:
                             HandleRotateMode();
-                            break;
-                        case PlayerInput.PrimaryAttack:
-                            HandlePlayerAttack();
                             break;
                         default:
                             break;
