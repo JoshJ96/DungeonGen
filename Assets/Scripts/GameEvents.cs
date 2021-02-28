@@ -5,18 +5,16 @@ using UnityEngine;
 
 public class GameEvents : MonoBehaviour
 {
-    private void Start()
-    {
-        DontDestroyOnLoad(this.gameObject);
-    }
-
     #region Singleton
     public static GameEvents instance;
-    void Awake()
+    private void Awake()
     {
         instance = this;
+        //DontDestroyOnLoad(this.gameObject);
     }
     #endregion
+
+
 
     //Move a singular unit
     public event Action<Unit, Vector3> moveUnit;

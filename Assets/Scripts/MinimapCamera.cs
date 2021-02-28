@@ -10,6 +10,7 @@ public class MinimapCamera : MonoBehaviour
     Vector3 fixedTransform;
     int fixedOrthographicSize;
     public int zoomOrthographicSize;
+    int startX, startY;
 
     Camera cam;
 
@@ -19,25 +20,53 @@ public class MinimapCamera : MonoBehaviour
         Zoom
     }
 
-    public State currentState = State.Zoom;
+    private State CurrentState = State.Zoom;
 
-    // Start is called before the first frame update
-    void Start()
+    public State currentState
+    {
+        private get
+        {
+            return CurrentState;
+        }
+        set
+        {
+            switch (value)
+            {
+                case State.Fixed:
+                    transform.position = fixedTransform;
+                    cam.orthographicSize = fixedOrthographicSize;
+                    break;
+                case State.Zoom:
+                    cam.orthographicSize = zoomOrthographicSize;
+                    transform.position = new Vector3(PlayerUnit.instance.transform.position.x, 1, PlayerUnit.instance.transform.position.z);
+                    break;
+                default:
+                    break;
+            }
+            CurrentState = value;
+
+        }
+    }
+
+
+    private void Awake()
     {
         cam = GetComponent<Camera>();
-        GameEvents.instance.pushDungeonData += PushDungeonData;
+        GameObject.FindObjectOfType<GameEvents>().pushDungeonData += PushDungeonData;
     }
 
     public void PushDungeonData(DungeonData data)
     {
-        print("hi");
+        startX = (int) data.playerSpawnRoom.V3Center.x;
+        startY = (int) data.playerSpawnRoom.V3Center.y;
+        currentState = State.Zoom;
         fixedTransform = transform.position = new Vector3(data.mapWidth / 2, 1, data.mapHeight / 2);
         fixedOrthographicSize = data.mapWidth / 2;
     }
 
     private void Update()
     {
-        switch (currentState)
+        switch (CurrentState)
         {
             case State.Fixed:
                 transform.position = fixedTransform;
@@ -51,8 +80,28 @@ public class MinimapCamera : MonoBehaviour
             default:
                 break;
         }
+
+        if (Input.GetKeyDown(KeyCode.JoystickButton6))
+        {
+            Toggle();
+        }
     }
 
 
+
+    public void Toggle()
+    {
+        switch (CurrentState)
+        {
+            case State.Fixed:
+                currentState = State.Zoom;
+                break;
+            case State.Zoom:
+                currentState = State.Fixed;
+                break;
+            default:
+                break;
+        }
+    }
 
 }

@@ -15,7 +15,7 @@ public class Minimap_Drawer : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         GameEvents.instance.turnPass += TurnPass;

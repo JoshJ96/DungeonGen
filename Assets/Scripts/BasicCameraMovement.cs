@@ -11,7 +11,7 @@ public class BasicCameraMovement : MonoBehaviour
     public GameObject target;
     public Vector3 offset;
 
-    private void Start()
+    private void Awake()
     {
         GameEvents.instance.pushDungeonData += PushDungeonData;
 

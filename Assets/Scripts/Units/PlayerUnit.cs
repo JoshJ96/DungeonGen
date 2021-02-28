@@ -11,6 +11,8 @@ public class PlayerUnit : Unit
     private void Awake()
     {
         instance = this;
+        GameEvents.instance.pushDungeonData += PushDungeonData;
+
     }
     #endregion
 
@@ -18,12 +20,8 @@ public class PlayerUnit : Unit
     List<Unit> attackTargets = new List<Unit>();
     float blendValue;
 
-    private void Start()
-    {
-        GameEvents.instance.pushDungeonData += PushDungeonData;
-    }
 
-    private void PushDungeonData(DungeonData data)
+    void PushDungeonData(DungeonData data)
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(data.playerSpawnRoom.V3Center));
 
