@@ -37,12 +37,11 @@ public class EnemyUnit : Unit
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
-        GameEvents.instance.doDamage += DoDamage;
 
         animator = GetComponent<Animator>();
     }
 
-    private void DoDamage(Unit arg1, Unit arg2, int arg3)
+    private void LateUpdate()
     {
         if (currentHitpoints <= 0)
         {

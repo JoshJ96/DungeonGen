@@ -17,7 +17,8 @@ public partial class BoardManager : MonoBehaviour
         WaitingForEnemyMovementEnd,
         EnemyAttackPhase,
         Looting,
-        WaitingForPlayerAttackEnd
+        WaitingForPlayerAttackEnd,
+        Pause
     }
     public void ChangeState(States state) => currentState = state;
 
