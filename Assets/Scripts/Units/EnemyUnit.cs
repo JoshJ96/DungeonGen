@@ -27,10 +27,7 @@ public class EnemyUnit : Unit
 
     Animator animator;
 
-    public int maxHitpoints;
-    private int currentHitpoints;
-    public int GetCurrentHitpoints() => currentHitpoints;
-    public void SetCurrentHitpoints(int hp) => currentHitpoints = hp;
+
 
     private void Start()
     {
@@ -40,8 +37,19 @@ public class EnemyUnit : Unit
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
+        GameEvents.instance.doDamage += DoDamage;
 
         animator = GetComponent<Animator>();
+    }
+
+    private void DoDamage(Unit arg1, Unit arg2, int arg3)
+    {
+        if (currentHitpoints <= 0)
+        {
+            GameEvents.instance.EnemyDestruction(this);
+            Grid.instance.grid[GetCurrentNode().gridX, GetCurrentNode().gridY].walkable = true;
+            Destroy(gameObject);
+        }
     }
 
     public override void MoveUnit(Vector3 destination)
@@ -51,15 +59,6 @@ public class EnemyUnit : Unit
         Grid.instance.NodeFromWorldPoint(transform.position).walkable = true;
         Grid.instance.NodeFromWorldPoint(destination).walkable = false;
         StartCoroutine(Move(destination));
-    }
-
-    private void LateUpdate()
-    {
-        if (currentHitpoints <= 0)
-        {
-            GameEvents.instance.EnemyDestruction(this);
-            Destroy(gameObject);
-        }
     }
 
     //If a player is within aggro range, change the current state
@@ -91,18 +90,25 @@ public class EnemyUnit : Unit
 
     public void Attack(Unit toAttack)
     {
+        isAttacking = true;
         RotateTowards(toAttack.transform.position);
-        int randomDamage = UnityEngine.Random.Range(1, 10);
-        GameEvents.instance.DoDamage(this, toAttack, randomDamage);
-        StartCoroutine(PerformAttack());
+        animator.SetBool("Attacking", true);
     }
 
-    IEnumerator PerformAttack()
+    /*************************
+     * ANIMATION EVENTS ONLY *
+     *************************/
+    void Anim_EndAttack()
     {
-        animator.SetBool("Attacking", true);
-        isAttacking = true;
-        yield return new WaitForSeconds(0.5f);
-        isAttacking = false;
         animator.SetBool("Attacking", false);
+        isAttacking = false;
+    }
+
+    void Anim_DealDamage()
+    {
+        Unit takingDamage = PlayerUnit.instance;
+        int randomDamage = UnityEngine.Random.Range(1, 10);
+        GameEvents.instance.DoDamage(this, takingDamage, randomDamage);
+        takingDamage.SetCurrentHitpoints(takingDamage.GetCurrentHitpoints() - randomDamage);
     }
 }

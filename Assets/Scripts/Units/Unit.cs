@@ -38,6 +38,12 @@ public class Unit : MonoBehaviour
     }
     #endregion
 
+    public int maxHitpoints;
+    public int currentHitpoints;
+
+    public int GetCurrentHitpoints() => currentHitpoints;
+    public void SetCurrentHitpoints(int hp) => currentHitpoints = hp;
+
     public int walkSpeed = 7;
 
     //Desired Node (used in Board Manager)
@@ -48,6 +54,8 @@ public class Unit : MonoBehaviour
     private Node currentNode;
         public void SetCurrentNode(Node node) => currentNode = node;
         public Node GetCurrentNode() => currentNode;
+
+    public int displacementAngle;
 
     //Attack and aggro ranges
     [Range(0, 10)]
@@ -79,29 +87,10 @@ public class Unit : MonoBehaviour
         return range;
     }
 
-    //Draws aggro range
-    private void OnDrawGizmosSelected()
-    {
-        //Draw attack range
-        foreach (Node node in GetRange(aggroRange))
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(node.GetWorldPoint(), Vector3.one);
-        }
-        //Draws attack range
-        foreach (Node node in GetRange(attackRange))
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(node.GetWorldPoint(), Vector3.one);
-        }
-    }
-
     public virtual void MoveUnit(Vector3 destination)
     {
         destination = new Vector3(destination.x, transform.position.y, destination.z);
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(destination));
-        //Grid.instance.NodeFromWorldPoint(transform.position).walkable = true;
-        //Grid.instance.NodeFromWorldPoint(destination).walkable = false;
         StartCoroutine(Move(destination));
     }
 
@@ -141,6 +130,6 @@ public class Unit : MonoBehaviour
 
         //Calculate movement angle and rotate
         float targetAngle = Mathf.Atan2(targetVector.x, targetVector.z) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+        transform.rotation = Quaternion.Euler(0f, targetAngle + displacementAngle, 0f);
     }
 }

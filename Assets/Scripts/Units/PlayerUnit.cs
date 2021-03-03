@@ -45,6 +45,7 @@ public class PlayerUnit : Unit
 
     public void Attack()
     {
+        print("hi");
         isAttacking = true;
         //Get tile to check
         Vector3 tileToCheck = Vector3.zero;
