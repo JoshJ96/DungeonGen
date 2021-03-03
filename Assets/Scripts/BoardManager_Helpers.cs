@@ -49,25 +49,6 @@ public partial class BoardManager : MonoBehaviour
         return false;
     }
 
-    //Upon turn passing, allow inputs again
-    private void TurnPass()
-    {
-        canInput = true;
-    }
-
-    bool objectAtWorldPoint(Vector3 location, string tag)
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(location, 0.1f);
-        foreach (var hitCollider in hitColliders)
-        {
-            if (hitCollider.gameObject.CompareTag(tag))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void ReadForInputs()
     {
         //Primary attack key pressed
@@ -85,7 +66,7 @@ public partial class BoardManager : MonoBehaviour
         }
 
         //Diagonal mode key pressed
-        else if (Input.GetKey(KeyCode.JoystickButton4))
+        else if (Input.GetKey(KeyCode.JoystickButton4) || Input.GetKey(KeyCode.LeftControl))
         {
             ChangeState(PlayerInput.DiagonalMode);
             return;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Presets;
 using UnityEngine;
 
 public class MinimapCamera : MonoBehaviour
@@ -52,7 +51,7 @@ public class MinimapCamera : MonoBehaviour
     private void Awake()
     {
         cam = GetComponent<Camera>();
-        GameObject.FindObjectOfType<GameEvents>().pushDungeonData += PushDungeonData;
+        FindObjectOfType<GameEvents>().pushDungeonData += PushDungeonData;
     }
 
     public void PushDungeonData(DungeonData data)

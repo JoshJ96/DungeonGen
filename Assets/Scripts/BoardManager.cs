@@ -38,48 +38,18 @@ public partial class BoardManager : MonoBehaviour
     }
     public void ChangeState(PlayerInput input)
     {
-        if (input == PlayerInput.RotateMode)
-        {
-            //arrow8Dir.SetTrigger("DisplayArrows");
-        }
-        else
-        {
-           // arrow8Dir.SetTrigger("DisableArrows");
-        }
         playerInput = input;
     }
 
     #endregion
 
     List<EnemyUnit> enemyAttackingUnits = new List<EnemyUnit>();
-    bool canInput = true;
-
-    private void Start()
-    {
-        GameEvents.instance.turnPass += TurnPass;
-        GameEvents.instance.doDamage += DoDamage;
-    }
-
-    private void DoDamage(Unit doingDamage, Unit takingDamage, int amount)
-    {
-        foreach (Transform item in takingDamage.gameObject.transform)
-        {
-            if (item.CompareTag("Overhead Location"))
-            {
-                //GameObject damageIndicator = Instantiate(damageIndicatorObject, item.transform.position + Vector3.up, Quaternion.Euler(new Vector3(transform.rotation.x,0,0)));
-
-                //damageIndicator.GetComponent<TMPro.TextMeshPro>().text = $"{amount}";
-                return;
-            }
-        }
-    }
 
     void Update()
     {
         switch (currentState)
         {
             case States.WaitingForPlayerInput:
-                if (canInput)
                 {
                     ReadForInputs();
                     switch (playerInput)
@@ -98,6 +68,9 @@ public partial class BoardManager : MonoBehaviour
                             break;
                         case PlayerInput.RotateMode:
                             HandleRotateMode();
+                            break;
+                        case PlayerInput.DiagonalMode:
+                            HandleDiagonalMode();
                             break;
                         default:
                             break;
@@ -124,8 +97,6 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandleWaitingForPlayerAttackEnd()
     {
-        //arrow8Dir.SetTrigger("DisableArrows");
-        canInput = false;
         if (!PlayerUnit.instance.isAttacking)
         {
             ChangeState(States.CalculatingMovements);
@@ -135,7 +106,6 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandlePlayerAttack()
     {
-        canInput = false;
         currentState = States.WaitingForPlayerAttackEnd;
         PlayerUnit.instance.isAttacking = true;
         PlayerUnit.instance.Attack();
@@ -143,7 +113,6 @@ public partial class BoardManager : MonoBehaviour
 
     private void HandlePlayerMovement()
     {
-        canInput = false;
         Node currentPlayerNode = PlayerUnit.instance.GetCurrentNode();
         Node desiredNodeLocation = Grid.instance.grid[
             currentPlayerNode.gridX + Mathf.RoundToInt(GetInputVector().x),
@@ -159,26 +128,48 @@ public partial class BoardManager : MonoBehaviour
         else
         {
             PlayerUnit.instance.RotateTowards(desiredNodeLocation.GetWorldPoint());
-            canInput = true;
+            GameEvents.instance.TurnPass();
+        }
+    }
+
+    private void HandleDiagonalMode()
+    {
+        //Diagonal only desired nodes
+        Node currentPlayerNode = PlayerUnit.instance.GetCurrentNode();
+
+        Node desiredNodeLocation = Grid.instance.grid[
+            currentPlayerNode.gridX + Mathf.RoundToInt(GetInputVector().x),
+            currentPlayerNode.gridY + Mathf.RoundToInt(GetInputVector().z)
+            ];
+
+        if (desiredNodeLocation.gridX - currentPlayerNode.gridX == 0 || desiredNodeLocation.gridY - currentPlayerNode.gridY == 0)
+        {
+            return;
+        }
+
+
+
+        if (desiredNodeLocation.walkable)
+        {
+            ChangeState(States.CalculatingMovements);
+            PlayerUnit.instance.SetDesiredNode(desiredNodeLocation);
+            MoveEnemyUnits();
+        }
+        else
+        {
+            PlayerUnit.instance.RotateTowards(desiredNodeLocation.GetWorldPoint());
             GameEvents.instance.TurnPass();
         }
     }
 
     private void HandleLooting()
     {
-        if (objectAtWorldPoint(PlayerUnit.instance.transform.position + Vector3.forward, "Chest"))
-        {
-            if (PlayerUnit.instance.GetDirection() == Unit.Direction.North)
-            {
-                //Loot stuff
-            }
-        }
+
     }
 
     private void HandleResting()
     {
         ChangeState(States.CalculatingMovements);
-        canInput = false;
         MoveEnemyUnits();
     }
 
