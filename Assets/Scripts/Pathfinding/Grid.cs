@@ -129,6 +129,20 @@ public class Grid : MonoBehaviour
 		return grid[(int)worldPosition.x, (int)worldPosition.z];
 	}
 
+	public Node GetRandomWalkableNode()
+    {
+        while (true)
+        {
+			int rngX = UnityEngine.Random.Range(0, gridSizeX-1);
+			int rngY = UnityEngine.Random.Range(0, gridSizeY-1);
+
+            if (grid[rngX,rngY].walkable)
+            {
+				return grid[rngX, rngY];
+			}
+		}
+    }
+
 	void OnDrawGizmos()
 	{
         if (gizmo)

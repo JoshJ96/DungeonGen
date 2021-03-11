@@ -521,6 +521,7 @@ MonoBehaviour:
   mapHeight: 100
   roomMinSize: 5
   roomMaxSize: 10
+  bspDeviation: 0.05
   roomOverlapPreventionFactor: 2.62
   numberDivides: 5
   wallObj: {fileID: 1001726653373610900, guid: 7bc9d2bed27aaf0459591b6fde9315cd, type: 3}
@@ -528,9 +529,12 @@ MonoBehaviour:
     type: 3}
   playerObj: {fileID: 1689056612}
   camObj: {fileID: 1299624794}
-  bspDeviation: 0.05
   testMode: 0
   drawWalls: 1
+  maxEnemies: 10
+  spawnChances:
+  - {fileID: 11400000, guid: fe36a6fb03dc0ab47b52a1ee76821f1c, type: 2}
+  - {fileID: 11400000, guid: 7f5df9b8d586c1446b3c888e91e2d791, type: 2}
 --- !u!4 &433419540
 Transform:
   m_ObjectHideFlags: 0
@@ -2329,7 +2333,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   facingDirection: 0
+  maxHitpoints: 0
+  currentHitpoints: 0
   walkSpeed: 6
+  displacementAngle: 0
   attackRange: 0
   aggroRange: 0
   moving: 0

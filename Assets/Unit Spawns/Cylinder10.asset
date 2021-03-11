@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc761430ffa10743a3f35bd3739c48b, type: 3}
+  m_Name: Cylinder10
+  m_EditorClassIdentifier: 
+  unit: {fileID: 4140366338652559427, guid: 9fccc8391a6d9a346bbc75eb206eda1e, type: 3}
+  percentChance: 10

@@ -82,27 +82,27 @@ public class DungeonGenerator : MonoBehaviour
         Y
     }
 
+    [Header("Identity")]
     public string dungeonName;
     public int floorNumber;
 
-    //Map size properties
+    [Header("Room Size")]
     [Range(20, 500)]
     public int mapWidth;
     [Range(20, 500)]
     public int mapHeight;
-
-    //Room size properties
     [Range(5, 100)]
     public int roomMinSize;
     [Range(5, 100)]
     public int roomMaxSize;
+    [Range(0, 0.1f)]
+    public float bspDeviation = 0.05f; //The % of random coords from middle to be chosen (0.05 = 5%)
 
-    //BSP Divider Root
+    //Stuff
     Divider root;
     public List<Divider> dividerList = new List<Divider>();
     public List<Room> roomList = new List<Room>();
     int finalIteration = 0;
-
     public Node[,] map;
 
     [Range(0,3)]
@@ -110,14 +110,20 @@ public class DungeonGenerator : MonoBehaviour
     public int numberDivides = 6;
     int divides;
 
-    public GameObject wallObj, floorObj, playerObj, camObj;
+    [Header("Objects")]
+    public GameObject wallObj;
+    public GameObject floorObj;
+    public GameObject playerObj;
+    public GameObject camObj;
 
-    //The % of random coords from middle to be chosen (0.05 = 5%)
-    [Range(0, 0.1f)]
-    public float bspDeviation = 0.05f;
-
+    [Header("Debug")]
     public bool testMode = true;
     public bool drawWalls = false;
+
+    [Header("Spawn")]
+    public int maxEnemies = 10;
+    public List<SpawnChance> spawnChances = new List<SpawnChance>();
+    public Dictionary<GameObject, int> hi = new Dictionary<GameObject, int>();
 
     private void Update()
     {
@@ -151,6 +157,7 @@ public class DungeonGenerator : MonoBehaviour
         Pass_Map_To_Grid();
         Instantiate_Terrain_Objects();
         Event_Push_Dungeon_Data();
+        Spawn_Enemies();
     }
 
     private void Initialize_Node_Map()
@@ -359,6 +366,7 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    
     private void Pass_Map_To_Grid()
     {
         if (testMode)
@@ -394,7 +402,51 @@ public class DungeonGenerator : MonoBehaviour
         GameEvents.instance.PushDungeonData(data);
     }
 
-    
+    private void Spawn_Enemies()
+    {
+        if (testMode) return;
+
+        //Stores the ranges off gameobjects to spawn
+        //Example:
+        //0-10  Enemy1
+        //10-90 Enemy2
+        //90-100 Enemy3
+        Dictionary<int[], GameObject> probability = new Dictionary<int[], GameObject>();
+        int minRange = 0;
+        foreach (var item in spawnChances.OrderByDescending(x => x.percentChance))
+        {
+            int maxRange = minRange + item.percentChance;
+            int[] range = { minRange, maxRange };
+            probability.Add(range, item.unit);
+            minRange += maxRange;
+        }
+
+        //Spawn stuff
+        int enemiesSpawned = 0;
+        while (enemiesSpawned < maxEnemies)
+        {
+            //Random 0-100
+            int rng = UnityEngine.Random.Range(0, 101);
+
+            foreach (var item in probability)
+            {
+                if (rng > item.Key[0] && rng < item.Key[1])
+                {
+                    //Spawn the unit avoiding the player's tile
+                    Node random = PlayerUnit.instance.GetCurrentNode();
+
+                    while (random == PlayerUnit.instance.GetCurrentNode())
+                    {
+                        random = Grid.instance.GetRandomWalkableNode();
+                        Instantiate(item.Value, new Vector3(random.gridX, 0.5f, random.gridY), Quaternion.identity);
+                    }
+                }
+            }
+            enemiesSpawned++;
+        }
+    }
+
+
     /*
     ██╗░░██╗███████╗██╗░░░░░██████╗░███████╗██████╗░░██████╗
     ██║░░██║██╔════╝██║░░░░░██╔══██╗██╔════╝██╔══██╗██╔════╝
