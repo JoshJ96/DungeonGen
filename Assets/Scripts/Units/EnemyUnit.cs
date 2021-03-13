@@ -27,8 +27,6 @@ public class EnemyUnit : Unit
 
     Animator animator;
 
-
-
     private void Start()
     {
         SetCurrentNode(Grid.instance.NodeFromWorldPoint(transform.position));
@@ -37,8 +35,23 @@ public class EnemyUnit : Unit
         currentHitpoints = maxHitpoints;
         GameEvents.instance.scanForPlayerInAggroRange += ScanForPlayerInAggroRange;
         GameEvents.instance.scanForPlayerInAttackRange += ScanForPlayerInAttackRange;
+        GameEvents.instance.doDamage += DoDamage;
 
         animator = GetComponent<Animator>();
+    }
+
+    private void DoDamage(Unit attacking, Unit defending, int amount)
+    {
+        //Weird stuff with C# events and gameobjects
+        if (this == null) return;
+
+        //Damage display
+        if (defending.gameObject == this.gameObject)
+        {
+            animator.SetTrigger("Hurt");
+            GameObject damageIndicator = Instantiate(GameObject.Find("DamageIndicator"), new Vector3(GetCurrentNode().gridX, 0, GetCurrentNode().gridY), Quaternion.identity);
+            damageIndicator.GetComponent<TMPro.TextMeshPro>().text = amount.ToString();
+        }
     }
 
     private void LateUpdate()
@@ -109,5 +122,10 @@ public class EnemyUnit : Unit
         int randomDamage = UnityEngine.Random.Range(1, 10);
         GameEvents.instance.DoDamage(this, takingDamage, randomDamage);
         takingDamage.SetCurrentHitpoints(takingDamage.GetCurrentHitpoints() - randomDamage);
+    }
+
+    void Anim_BackToIdle()
+    {
+        animator.SetTrigger("Idle");
     }
 }

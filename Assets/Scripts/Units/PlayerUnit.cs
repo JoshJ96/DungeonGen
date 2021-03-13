@@ -16,10 +16,29 @@ public class PlayerUnit : Unit
     }
     #endregion
 
-    public Animator animator;
+    Animator animator;
     List<Unit> attackTargets = new List<Unit>();
     float blendValue;
 
+    private void Start()
+    {
+        GameEvents.instance.doDamage += DoDamage;
+        animator = GetComponent<Animator>();
+    }
+
+    private void DoDamage(Unit attacking, Unit defending, int amount)
+    {
+        //Weird stuff with C# events and gameobjects
+        if (this == null) return;
+
+        //Damage display
+        if (defending.gameObject == this.gameObject)
+        {
+            animator.SetTrigger("Hurt");
+            GameObject damageIndicator = Instantiate(GameObject.Find("DamageIndicator"), new Vector3(GetCurrentNode().gridX, 0, GetCurrentNode().gridY), Quaternion.identity);
+            damageIndicator.GetComponent<TMPro.TextMeshPro>().text = amount.ToString();
+        }
+    }
 
     void PushDungeonData(DungeonData data)
     {
@@ -45,7 +64,6 @@ public class PlayerUnit : Unit
 
     public void Attack()
     {
-        print("hi");
         isAttacking = true;
         //Get tile to check
         Vector3 tileToCheck = Vector3.zero;

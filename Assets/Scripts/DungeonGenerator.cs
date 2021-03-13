@@ -413,9 +413,10 @@ public class DungeonGenerator : MonoBehaviour
         //90-100 Enemy3
         Dictionary<int[], GameObject> probability = new Dictionary<int[], GameObject>();
         int minRange = 0;
+        int maxRange = 0;
         foreach (var item in spawnChances.OrderByDescending(x => x.percentChance))
         {
-            int maxRange = minRange + item.percentChance;
+            maxRange = minRange + item.percentChance;
             int[] range = { minRange, maxRange };
             probability.Add(range, item.unit);
             minRange += maxRange;
@@ -426,7 +427,7 @@ public class DungeonGenerator : MonoBehaviour
         while (enemiesSpawned < maxEnemies)
         {
             //Random 0-100
-            int rng = UnityEngine.Random.Range(0, 101);
+            int rng = UnityEngine.Random.Range(0, maxRange);
 
             foreach (var item in probability)
             {
